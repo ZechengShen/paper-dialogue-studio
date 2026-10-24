@@ -13,25 +13,24 @@
     <header class="topbar shell">
       <a class="brand" href="/" aria-label="论文开讲首页">
         <span class="brand-mark" aria-hidden="true">P/</span>
-        <span><strong>论文开讲 · V3</strong><small>Research → Understanding → Teaching</small></span>
+        <span><strong>论文开讲</strong><small>研究与教学工作台 · V3</small></span>
       </a>
+      <nav class="workspace-nav" aria-label="工作台导航"><a href="#workspace">开始精读</a><a href="#recent">研究记录</a></nav>
       <div class="api-pill" id="api-pill" role="status"><span></span><b>正在检查项目</b><i id="pending-count">0 个任务</i></div>
     </header>
 
     <main>
       <section class="hero shell">
-        <p class="eyebrow">READ · REASON · TEACH</p>
-        <h1>读懂论文，<br /><em>也读懂背后的推理。</em></h1>
+        <h1>把论文读透，<br />把研究讲清楚。</h1>
         <p class="hero-copy">
-          从一篇或多篇材料出发，先建立可靠的研究底稿，再生成精读报告、后续研究计划、教学播客与按需小动画。
+          从 PDF、HTML 或 Notion 开始。<br />先认识工作，再理解方法与证据，最后变成可以阅读、收听和演示的讲解。
         </p>
       </section>
 
       <section class="workspace shell" id="workspace">
         <form class="input-card" id="paper-form">
           <div class="card-heading">
-            <span class="step-no">01</span>
-            <div><h2>开始一次精读</h2><p>上传材料，设定问题，选择 Codex 或 API 研究</p></div>
+            <div><h2>导入研究材料</h2><p>可以是一篇论文，也可以是围绕同一问题的一组文章。</p></div>
           </div>
 
           <div class="source-tabs" role="tablist" aria-label="输入方式">
@@ -88,7 +87,8 @@
             <p class="field-help" id="audience-help">决定先修知识、术语和公式解释的起点；不会降低原文证据的核验要求。</p>
           </div>
 
-          <div class="options-heading"><h3>制作偏好</h3><span>保留默认即可，也可按需调整</span></div>
+          <details class="production-options" id="production-options">
+          <summary><span>调整制作偏好</span><small id="production-summary">专业精读 · 双人对话 · 智能时长 · 生成人声</small></summary>
           <div class="options-grid">
             <label><span class="field-label">研究深度</span><select class="text-input" name="depth" id="depth-select">
               <option value="deep">专业精读 · 三遍阅读与技术重建</option><option value="standard">标准分析 · 重点论证与证据</option><option value="brief">快速简报 · 明确压缩范围</option>
@@ -124,6 +124,7 @@
           </div>
 
           <p class="duration-note">* 智能时长：单篇精读 30–60 分钟；多篇深读 45–60 分钟；简报 15–30 分钟。报告、研究计划、学习卡和脚本均会保留。</p>
+          </details>
 
           <div class="options-heading"><h3>生成方式</h3><span>两种入口，共用 V3 研究规范</span></div>
           <label class="field-label" for="execution-mode">由谁完成研究与脚本</label>
@@ -154,9 +155,9 @@
 
         <aside class="process-card">
           <div class="card-heading compact">
-            <span class="step-no">02</span>
-            <div><h2>推理路线</h2><p>每一步都保留可复核依据</p></div>
+            <div><h2>从材料到理解</h2><p>一份底稿，串起所有产物</p></div>
           </div>
+          <p class="orientation-note">默认你还没读过原文。讲解先介绍<strong>工作、作者和背景</strong>，再说明想做什么、做了什么、做成了什么。</p>
           <ol class="route-list">
             <li><span>1</span><div><b>收件与读取</b><small>保留原文件，提取正文，标出扫描页与待核看图表</small></div></li>
             <li><span>2</span><div><b>全文与证据</b><small>核验公开版本，逐篇建立可追溯阅读地图</small></div></li>
@@ -190,11 +191,11 @@
         <p id="progress-help">Codex 模式需复制指令；API 模式会自动开始。页面自动刷新，任务材料保存在本地。</p>
       </section>
 
-      <section class="recent shell"><h2>最近的研究任务</h2><div id="recent-jobs" class="recent-jobs"><p class="field-help">正在读取任务记录…</p></div></section>
+      <section class="recent shell" id="recent"><div class="recent-heading"><h2>研究记录</h2><p>材料与产物保存在本地，随时继续。</p></div><div id="recent-jobs" class="recent-jobs"><p class="field-help">正在读取任务记录…</p></div></section>
 
       <section class="results shell hidden" id="results">
         <div class="result-hero">
-          <p class="eyebrow">EPISODE READY</p>
+          <p class="eyebrow">研究与讲解</p>
           <h2 id="episode-title">节目标题</h2>
           <p id="paper-meta"></p>
           <div class="audio-wrap" id="audio-wrap">

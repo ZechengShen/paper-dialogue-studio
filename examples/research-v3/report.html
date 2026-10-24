@@ -1,13 +1,118 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>流程演示｜从文章到可追溯的研究与教学</title>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>流程演示｜从文章到可追溯的研究与教学</title>
 <style>
-:root{--ink:#202923;--soft:#606862;--line:#d9ddd6;--accent:#235e52;--paper:#f5f5f2}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font:16px/1.85 "Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);background:white}header{padding:24px 40px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;font-size:12px}.brand{letter-spacing:.12em;color:var(--accent);font-weight:600}a{color:var(--accent);text-underline-offset:4px}header nav{display:flex;gap:12px;flex-wrap:wrap}.layout{display:grid;grid-template-columns:220px minmax(0,800px);gap:48px;max-width:1200px;margin:0 auto;padding:48px 40px}aside{position:sticky;top:24px;align-self:start;border-top:2px solid var(--accent);padding-top:16px}aside small{font-size:12px;color:var(--soft)}aside a{display:block;text-decoration:none;font-size:13px;line-height:1.6;padding:8px 0;border-bottom:1px solid var(--line)}main{min-width:0}h1{font-size:clamp(28px,3.5vw,42px);line-height:1.35;letter-spacing:-.025em;font-weight:500;margin:0 0 28px}h2{font-size:24px;line-height:1.4;font-weight:500;margin:48px 0 20px;border-top:1px solid var(--line);padding-top:24px;scroll-margin-top:24px}h3{font-size:18px;font-weight:600;margin:28px 0 12px}p,li{overflow-wrap:anywhere}p{margin:12px 0}li{padding:4px 0}ul{padding-left:22px}main>p:first-of-type{font-size:19px;color:var(--accent)}footer{border-top:1px solid var(--line);padding:24px 40px;color:var(--soft);font-size:12px}a:focus-visible{outline:2px solid var(--accent);outline-offset:4px}@media(max-width:820px){.layout{grid-template-columns:1fr;padding:28px 24px;gap:24px}aside{position:static}aside nav{display:flex;gap:4px 20px;flex-wrap:wrap}aside a{font-size:12px}header,footer{padding:20px 24px}}@media(max-width:480px){.layout{padding:24px 18px}header,footer{padding:20px 18px}h2{font-size:22px}body{font-size:15px}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}@media print{aside,header nav{display:none}.layout{display:block;padding:0}header,footer{padding:16px 0}h2{break-after:avoid}body{font-size:11pt}a{color:inherit}}
-</style></head><body><header><span class="brand">PAPER / RESEARCH NOTE · V3</span><nav aria-label="相关产物"><a href="followup-plan.md">研究推进计划</a> · <a href="learning-cards.json">自测卡</a> · <a href="visuals/logic-chain.html">播放逻辑链</a></nav></header>
-<div class="layout"><aside><small>阅读导航</small><nav aria-label="报告目录"><a href="#section-1">综合判断</a><a href="#section-2">P1 · 研究制作流程 V3（项目设计文档）</a><a href="#section-3">论断与证据</a><a href="#section-4">逻辑链</a><a href="#section-5">共识、分歧与可比性</a><a href="#section-6">学习目标与先修知识</a><a href="#section-7">开放问题</a><a href="#section-8">阅读限制</a><a href="#section-9">来源</a><a href="#section-10">教学路径与理解检查</a></nav></aside><main><h1>流程演示｜从文章到可追溯的研究与教学</h1>
+:root { color-scheme:light; --ink:#202923; --soft:#606862; --line:#d9ddd6; --accent:#235e52; --paper:#f5f5f2; --reading-size:17px; }
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; color:var(--ink); background:#fff; font:16px/1.85 "Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif; -webkit-font-smoothing:antialiased; }
+[hidden] { display:none!important; }
+a { color:var(--accent); text-underline-offset:4px; }
+a,button,summary,input { touch-action:manipulation; }
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+button,input { font:inherit; }
+button { cursor:pointer; min-height:44px; border:1px solid var(--line); border-radius:6px; padding:8px 14px; background:#fff; color:var(--ink); font-size:13px; }
+button[aria-pressed=true] { color:var(--accent); border-color:var(--accent); background:#eaf0eb; }
+.skip { position:fixed; top:-80px; left:20px; background:white; z-index:20; padding:10px; }
+.skip:focus { top:12px; }
+.masthead { max-width:1240px; margin:auto; padding:24px 40px; border-bottom:1px solid var(--line); display:flex; align-items:center; justify-content:space-between; gap:24px; }
+.brand { font-size:14px; font-weight:600; color:var(--accent); }
+.masthead nav { display:flex; gap:20px; flex-wrap:wrap; font-size:13px; }
+.masthead a { display:inline-flex; align-items:center; min-height:44px; text-decoration:none; }
+.layout { display:grid; grid-template-columns:228px minmax(0,1fr); gap:64px; max-width:1240px; margin:0 auto; padding:40px; }
+aside { position:sticky; top:24px; align-self:start; max-height:calc(100vh - 48px); overflow:auto; scrollbar-width:thin; }
+aside summary { cursor:pointer; padding:8px 0; min-height:44px; font-size:14px; font-weight:500; }
+aside nav { counter-reset:chapter; margin-top:12px; }
+aside nav a { display:flex; gap:10px; text-decoration:none; color:var(--soft); font-size:13px; line-height:1.6; padding:10px 8px; min-height:44px; border-left:2px solid transparent; overflow-wrap:anywhere; }
+aside nav a::before { counter-increment:chapter; content:counter(chapter,decimal-leading-zero); font-size:11px; min-width:18px; padding-top:2px; font-variant-numeric:tabular-nums; }
+aside nav a[aria-current=location] { color:var(--accent); border-left-color:var(--accent); background:var(--paper); }
+aside small { display:block; color:var(--soft); font-size:12px; margin-top:16px; }
+main { min-width:0; max-width:800px; }
+.reader-tools { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:28px; }
+.reader-tools span { margin-right:auto; color:var(--soft); font-size:12px; }
+.report-meta { display:flex; flex-wrap:wrap; gap:12px 28px; padding:16px 0; margin:0 0 32px; border-block:1px solid var(--line); }
+.report-meta div { display:flex; gap:8px; align-items:baseline; font-size:12px; }
+.report-meta dt { color:var(--soft); }
+.report-meta dd { margin:0; color:var(--ink); font-size:14px; font-variant-numeric:tabular-nums; }
+.report-content { font-size:var(--reading-size); }
+h1 { font-size:clamp(30px,3.5vw,44px); line-height:1.35; letter-spacing:-.025em; font-weight:500; margin:0 0 24px; text-wrap:pretty; }
+h2 { font-size:26px; line-height:1.5; font-weight:500; margin:0 0 24px; scroll-margin-top:28px; }
+h3 { font-size:19px; line-height:1.6; font-weight:600; margin:32px 0 12px; }
+p,li,h1,h2,h3 { overflow-wrap:anywhere; }
+p { margin:14px 0; }
+ul { padding-left:24px; margin:16px 0; }
+li { padding:5px 0; }
+.report-content>p:first-of-type { font-size:20px; color:var(--accent); line-height:1.75; }
+.report-content>p:nth-of-type(2) { color:var(--soft); font-size:13px; margin-bottom:36px; }
+.report-section { padding:36px 0 12px; margin-top:28px; border-top:1px solid var(--line); }
+.report-section:first-of-type { border-top:2px solid var(--accent); }
+.report-section:target { scroll-margin-top:24px; }
+.report-section .evidence-line { color:var(--soft); font-size:13px; }
+.reader-end { display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; border-top:1px solid var(--line); padding-top:28px; margin-top:48px; color:var(--soft); font-size:13px; }
+.reader-end a { min-height:44px; display:inline-flex; align-items:center; }
+footer { max-width:1240px; margin:auto; border-top:1px solid var(--line); padding:24px 40px; color:var(--soft); font-size:12px; }
+#reading-progress { position:fixed; top:0; left:0; width:100%; height:3px; border:0; accent-color:var(--accent); z-index:5; }
+#reading-progress::-webkit-progress-bar { background:transparent; }
+#reading-progress::-webkit-progress-value { background:var(--accent); }
+.focus-reading aside { display:none; }
+.focus-reading .layout { display:block; max-width:880px; }
+.large-type { --reading-size:20px; }
+@media(max-width:1000px) { .layout { gap:36px; grid-template-columns:190px minmax(0,1fr); padding:32px 28px; } }
+@media(max-width:820px) {
+  .layout { grid-template-columns:1fr; gap:24px; padding:24px; }
+  aside { position:static; max-height:none; border-bottom:1px solid var(--line); padding-bottom:8px; }
+  aside nav { max-height:320px; overflow:auto; }
+  aside small { display:none; }
+  .masthead,footer { padding:20px 24px; }
+  .masthead { align-items:flex-start; flex-direction:column; gap:4px; }
+  .masthead nav { gap:8px 20px; }
+}
+@media(max-width:480px) {
+  .layout,.focus-reading .layout { padding:24px 20px; }
+  .masthead,footer { padding:16px 20px; }
+  .report-content { font-size:var(--reading-size); }
+  .reader-tools { gap:8px; margin-bottom:24px; }
+  .reader-tools span { width:100%; }
+  h1 { font-size:30px; }
+  h2 { font-size:23px; }
+  .report-meta { gap:8px 20px; margin-bottom:24px; }
+  .report-section { margin-top:24px; padding-top:28px; }
+}
+@media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+@media print {
+  .masthead nav,aside,.reader-tools,.reader-end,#reading-progress,.skip { display:none!important; }
+  .layout,.focus-reading .layout { display:block; max-width:none; padding:0; }
+  main { max-width:none; }
+  .masthead,footer { padding:12px 0; }
+  body,.report-content,.large-type .report-content { font-size:11pt; }
+  h1 { font-size:24pt; } h2 { font-size:17pt; } h3 { font-size:13pt; }
+  h1,h2,h3 { break-after:avoid; }
+  p,li { orphans:3; widows:3; }
+  .report-section { margin-top:18px; padding-top:18px; }
+  a { color:inherit; } @page { margin:18mm; }
+}
+</style>
+</head>
+<body id="top">
+<a class="skip" href="#report-content">跳转到正文</a>
+<progress id="reading-progress" value="0" max="100" aria-label="页面滚动位置" hidden></progress>
+<header class="masthead"><span class="brand">论文开讲 / 精读报告</span><nav aria-label="相关产物"><a href="followup-plan.md">研究推进计划</a><a href="learning-cards.json">自测卡</a><a href="visuals/logic-chain.html">播放逻辑链</a></nav></header>
+<div class="layout">
+<aside><details id="contents" open><summary>阅读目录</summary><nav aria-label="报告目录"><a href="#section-1">综合判断</a><a href="#section-2">P1 · 研究制作流程 V3（项目设计文档）</a><a href="#section-3">论断与证据</a><a href="#section-4">逻辑链</a><a href="#section-5">共识、分歧与可比性</a><a href="#section-6">学习目标与先修知识</a><a href="#section-7">开放问题</a><a href="#section-8">阅读限制</a><a href="#section-9">来源</a><a href="#section-10">教学路径与理解检查</a></nav></details><small>可按章节跳读；完整证据与阅读限制始终保留。</small></aside>
+<main>
+<div class="reader-tools" hidden><span id="reading-location">从研究问题开始</span><button id="reader-focus" type="button" aria-pressed="false">专注阅读</button><button id="reader-type" type="button" aria-pressed="false">大字阅读</button></div>
+<dl class="report-meta"><div><dt>论文</dt><dd>1</dd></div><div><dt>论断</dt><dd>4</dd></div><div><dt>证据记录</dt><dd>4</dd></div><div><dt>章节</dt><dd>10</dd></div></dl>
+<article class="report-content" id="report-content" tabindex="-1"><h1>流程演示｜从文章到可追溯的研究与教学</h1>
 <p>研究问题：怎样先读懂，再清楚地讲出来，并保持报告、播客与动画一致？</p>
 <p>读者：希望建立固定研究流程的读者 · 深度：standard</p>
+<section class="report-section" aria-labelledby="section-1">
 <h2 id="section-1">综合判断</h2>
 <p>这是项目 V3 的可运行流程示例，不是新的论文研究成果。核心是把专业阅读、证据纪律和教学表达连接起来，同时保留不确定性。</p>
+</section>
+<section class="report-section" aria-labelledby="section-2">
 <h2 id="section-2">P1 · 研究制作流程 V3（项目设计文档）</h2>
 <p>研究问题：如何组织研究与教学制作？</p>
 <p>方法：分阶段建立证据、分析、教学与验收产物。</p>
@@ -30,28 +135,28 @@
 </ul>
 <h3>最先要解决的不是声音，而是什么？</h3>
 <p>先形成可回到原文的研究判断，媒体制作才有可靠输入。</p>
-<p>状态：answered；证据：E1</p>
+<p class="evidence-line">状态：answered；证据：E1</p>
 <h3>相对原有制作方式，这次改变了什么？</h3>
 <p>研究底稿成为多种输出的共同依据，新增专业追问与明确的内容复核。</p>
-<p>状态：answered；证据：E2</p>
+<p class="evidence-line">状态：answered；证据：E2</p>
 <h3>为什么保留论断与证据的独立编号？</h3>
 <p>它们让一句结论能追到原文，也方便脚本和动画共用同一结论。编号不代替内容核查。</p>
-<p>状态：answered；证据：E2</p>
+<p class="evidence-line">状态：answered；证据：E2</p>
 <h3>怎样知道一个产物对应当前稿件？</h3>
 <p>本地发布记录绑定稿件与产物的哈希；检查的是版本一致性而非科学真伪。</p>
-<p>状态：answered；证据：E4</p>
+<p class="evidence-line">状态：answered；证据：E4</p>
 <h3>不做动画是否也能完成教学？</h3>
 <p>可以。短段文字或表格已说清的问题，不必增加动画。</p>
-<p>状态：answered；证据：E3</p>
+<p class="evidence-line">状态：answered；证据：E3</p>
 <h3>自动验证通过是否代表研究正确？</h3>
 <p>不是。还要核对原文、推理、适用条件与未解决问题；技术音频检查也不等于听感。</p>
-<p>状态：answered；证据：E4</p>
+<p class="evidence-line">状态：answered；证据：E4</p>
 <h3>这份示例复现了什么？</h3>
 <p>它只示范本地数据到报告与动画的流程，没有复现实验或模型。</p>
-<p>状态：answered；证据：E1</p>
+<p class="evidence-line">状态：answered；证据：E1</p>
 <h3>先做哪项实际验证最有价值？</h3>
 <p>选一篇真实论文完成一轮，再检查听众能否回答机制与边界问题。</p>
-<p>状态：answered；证据：E3</p>
+<p class="evidence-line">状态：answered；证据：E3</p>
 <ul>
 <li>材料性质 [supported]：这是项目工作流与教学设计说明，不是关于教学效果的实证论文。</li>
 <li>教学效果 [unclear]：尚无真实听众测试，不能宣称已经改善学习效果。</li>
@@ -86,6 +191,8 @@
 <p>纠正：这些只说明文件结构与表现形式可用；真实理解需要内容核查和可检验的解释。</p>
 <p>迁移问题：把脚本一句话改了，旧音频还能直接发布吗？</p>
 <p>参考答案：不能；应重新核对内容，并生成或复用正确片段，更新与脚本绑定的发布记录。</p>
+</section>
+<section class="report-section" aria-labelledby="section-3">
 <h2 id="section-3">论断与证据</h2>
 <h3>C1 · author_claim</h3>
 <p>本流程先完成研究判断，再进行媒体制作。</p>
@@ -111,6 +218,8 @@
 <ul>
 <li>E4｜S1 · 音频生产升级／验收：成片保留发布记录，技术检查与科学内容、听感检查分开。 （verified）</li>
 </ul>
+</section>
+<section class="report-section" aria-labelledby="section-4">
 <h2 id="section-4">逻辑链</h2>
 <ul>
 <li>N1 · 先问一个具体问题：不是从术语列表开始，而是确定这次到底想理解或判断什么。（C1）</li>
@@ -125,10 +234,14 @@
 <li>N4 → N5 [enables]：讲解之后用预测题检查理解。</li>
 <li>N5 → N6 [motivates]：暴露的问题需要回到材料修正。</li>
 </ul>
+</section>
+<section class="report-section" aria-labelledby="section-5">
 <h2 id="section-5">共识、分歧与可比性</h2>
 <ul>
 <li>媒体输出共享研究依据。</li>
 </ul>
+</section>
+<section class="report-section" aria-labelledby="section-6">
 <h2 id="section-6">学习目标与先修知识</h2>
 <ul>
 <li>理解研究与媒体之间的依赖</li>
@@ -138,18 +251,26 @@
 <ul>
 <li>不需要专业背景</li>
 </ul>
+</section>
+<section class="report-section" aria-labelledby="section-7">
 <h2 id="section-7">开放问题</h2>
 <ul>
 <li>真实论文任务中，哪些检查最能提高可理解性？</li>
 </ul>
+</section>
+<section class="report-section" aria-labelledby="section-8">
 <h2 id="section-8">阅读限制</h2>
 <ul>
 <li>这是软件与工作流演示，不是全文论文精读，不包含播客音频或独立专家认证。</li>
 </ul>
+</section>
+<section class="report-section" aria-labelledby="section-9">
 <h2 id="section-9">来源</h2>
 <ul>
 <li>S1｜研究制作流程 V3（项目设计文档）｜V3 / 2026-10-24｜../../../WORKFLOW.md｜核验：2026-10-24</li>
 </ul>
+</section>
+<section class="report-section" aria-labelledby="section-10">
 <h2 id="section-10">教学路径与理解检查</h2>
 <h3>研究流程</h3>
 <p>问题：怎样知道一个讲解是真的讲清楚，而不只是听起来流畅？</p>
@@ -157,4 +278,41 @@
 <p>先预测：如果原文证据缺失，更多动画或更自然的人声能补上这个缺口吗？先给出你的判断。</p>
 <p>迁移检查：将一个已经生成的脚本修改后，为什么不能继续发布旧音频？</p>
 <p>参考解释：旧音频不再对应当前主张和证据；需重新生成受影响片段并核对版本。结构检查和科学复核仍是两种不同工作。</p>
-<p>论断：C2, C4</p></main></div><footer>AI 辅助研究产物 · 结构检查不等于科学结论已获独立验证。请结合原文、阅读限制与发布复核记录使用。</footer></body></html>
+<p>论断：C2, C4</p>
+</section></article>
+<div class="reader-end"><p>读完后，试着用自己的话解释核心结论与它的边界。</p><a href="#top">返回页首</a></div>
+</main>
+</div>
+<footer>AI 辅助研究产物 · 结构检查不等于科学结论已获独立验证。请结合原文、阅读限制与发布复核记录使用。</footer>
+<script>
+(() => {
+  const root=document.documentElement, contents=document.getElementById('contents');
+  const links=[...document.querySelectorAll('aside nav a')];
+  const headings=[...document.querySelectorAll('.report-section h2')];
+  const progress=document.getElementById('reading-progress');
+  document.querySelector('.reader-tools').hidden=false; progress.hidden=false;
+  const compact=matchMedia('(max-width:820px)');
+  const adapt=()=>{contents.open=!compact.matches;};
+  compact.addEventListener('change',adapt); adapt();
+  const toggles=[['reader-focus','focus-reading'],['reader-type','large-type']];
+  toggles.forEach(([id,cls])=>document.getElementById(id).addEventListener('click',()=>{
+    const enabled=root.classList.toggle(cls);
+    document.getElementById(id).setAttribute('aria-pressed',String(enabled)); update();
+  }));
+  let scheduled=false;
+  function update(){
+    scheduled=false;
+    const max=document.documentElement.scrollHeight-innerHeight;
+    progress.value=max>0?Math.round(100*Math.min(1,Math.max(0,scrollY/max))):100;
+    let active=-1;
+    headings.forEach((heading,i)=>{if(heading.getBoundingClientRect().top<=140)active=i;});
+    links.forEach((link,i)=>{if(i===active)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
+    document.getElementById('reading-location').textContent=active<0?'从研究问题开始':'当前位置：'+headings[active].textContent;
+  }
+  function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(update);}}
+  addEventListener('scroll',schedule,{passive:true}); addEventListener('resize',schedule);
+  addEventListener('hashchange',schedule); update();
+})();
+</script>
+</body>
+</html>

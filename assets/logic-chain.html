@@ -6,35 +6,58 @@
 <title>研究逻辑链</title>
 <style>
 :root{color-scheme:light;--bg:#f5f5f2;--panel:#fff;--ink:#202923;--soft:#606862;--line:#d9ddd6;--accent:#235e52;--pale:#eaf0eb}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 system-ui,"Microsoft Yahei",sans-serif}
-main{max-width:1120px;margin:auto;padding:40px 28px}header{max-width:850px}h1{font-size:clamp(26px,4vw,40px);line-height:1.25;margin:10px 0 20px}
-.eyebrow{font-size:13px;letter-spacing:.12em;color:var(--accent)}.lead{color:var(--soft)}
-.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:24px 0}button{font:inherit;min-height:44px;padding:8px 16px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer}
-button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}button:disabled{opacity:.45;cursor:default}#play{background:var(--accent);color:var(--bg);font-weight:600}
-.layout{display:grid;grid-template-columns:minmax(240px, .8fr) minmax(300px,1.2fr);gap:32px;align-items:start}
-#chain{padding:0;margin:0;list-style:none}.node{position:relative;margin:0 0 26px;padding:0}
-.node:not(:last-child):after{content:"↓";position:absolute;left:23px;bottom:-27px;color:var(--soft);font-size:20px}
-.node button{display:flex;align-items:center;gap:14px;text-align:left;width:100%;padding:14px 16px;transition:transform .25s ease,background .25s ease}
-.node[aria-current=true] button{background:var(--pale);border-color:var(--accent);transform:translateX(5px)}
-.number{font-variant-numeric:tabular-nums;color:var(--accent);font-size:22px;min-width:28px}
-.detail{padding:26px;background:var(--panel);border:1px solid var(--line);border-radius:14px;min-width:0}
-h2{margin:0 0 18px;font-size:25px;line-height:1.4}.relation{color:var(--accent);font-size:14px}.tag{font-size:12px;color:var(--accent)}
-.claim{border-top:1px solid var(--line);padding:16px 0}.boundary{color:var(--soft);font-size:14px}
-details{font-size:14px;overflow-wrap:anywhere}summary{cursor:pointer;padding:10px 0}a{color:var(--accent)}
-#meter{height:5px;background:var(--line);margin:16px 0 28px}#fill{height:100%;width:0;background:var(--accent)}
-footer{color:var(--soft);font-size:13px;margin-top:28px}.reduced{color:var(--soft);font-size:13px}
-@media(max-width:680px){main{padding:24px 18px}.layout{grid-template-columns:1fr}.detail{padding:20px;grid-row:1}.node button{padding:10px 14px}.toolbar{gap:8px}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.8 "Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:1180px;margin:auto;padding:36px 32px}header{max-width:850px}h1,h2,h3{overflow-wrap:anywhere;font-weight:500;letter-spacing:-.02em}
+h1{font-size:clamp(28px,3.5vw,40px);line-height:1.35;margin:12px 0 16px}.eyebrow{font-size:13px;color:var(--accent)}.lead{color:var(--soft);font-size:15px;max-width:65ch}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:28px 0 16px}
+button{font:inherit;min-height:44px;padding:10px 16px;border:1px solid transparent;border-radius:6px;background:#e9ece6;color:var(--ink);cursor:pointer;font-size:14px;touch-action:manipulation}
+button:focus-visible,a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+button:disabled{opacity:.45;cursor:default}#play,#reveal{background:var(--accent);color:#fff}#present[aria-pressed=true]{border-color:var(--accent);color:var(--accent);background:var(--pale)}
+#position{font-size:13px;color:var(--soft);margin-left:auto;font-variant-numeric:tabular-nums}
+#meter{height:3px;background:var(--line);margin:0 0 32px}#fill{height:100%;width:0;background:var(--accent)}
+.layout{display:grid;grid-template-columns:minmax(200px,.65fr) minmax(0,1.35fr);gap:40px;align-items:start}
+#chain{padding:0;margin:0;list-style:none}.node{margin:0}
+.node button{display:flex;align-items:baseline;gap:16px;text-align:left;width:100%;border:0;border-radius:0;background:none;padding:16px 0;border-bottom:1px solid var(--line);transition:color .15s}
+.node[aria-current=true] button{color:var(--accent);font-weight:600;border-bottom-color:var(--accent);transform:none}
+.number{font-variant-numeric:tabular-nums;color:var(--soft);font-size:12px;min-width:24px}.node[aria-current=true] .number{color:var(--accent)}
+.detail{padding:0 0 0 32px;border-left:1px solid var(--line);min-width:0}
+h2{margin:8px 0 16px;font-size:28px;line-height:1.4}.relation{color:var(--accent);font-size:13px;margin-top:0}.tag{font-size:12px;color:var(--accent)}
+#explanation{font-size:17px;line-height:1.9;max-width:70ch}
+.claim{border-top:1px solid var(--line);padding:20px 0 8px;margin-top:24px}.boundary{color:var(--soft);font-size:14px}
+details{font-size:14px;overflow-wrap:anywhere}summary{cursor:pointer;padding:10px 0;min-height:44px}a{color:var(--accent);text-underline-offset:4px}
+footer{color:var(--soft);font-size:12px;margin-top:32px;border-top:1px solid var(--line);padding-top:20px}.reduced,.keyboard-note{color:var(--soft);font-size:12px}
+.hidden{display:none!important}.scene{border-top:1px solid var(--line);padding-top:24px;margin-top:28px}
+.scene-question{font-size:22px;line-height:1.6;margin:8px 0 24px}
+.comparison{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.condition{padding:20px;background:var(--panel);border-top:2px solid var(--line);min-width:0;overflow-wrap:anywhere}
+.condition small{color:var(--soft);font-size:12px}.condition p{margin:16px 0 0;font-size:17px;line-height:1.85}
+.condition.after{background:var(--pale);border-color:var(--accent)}
+.masked #after{display:none}.masked .after{min-height:128px}.masked .after:after{content:"先想一想：这个改变会带来什么？";display:block;margin-top:16px;font-size:15px;color:var(--soft)}
+#reveal{margin:24px 0 8px}#takeaway{font-size:16px;color:var(--accent);line-height:1.85}
+.presentation body{background:var(--panel)}.presentation main{max-width:1200px;padding-top:24px}
+.presentation header h1{font-size:16px;color:var(--soft);letter-spacing:0;max-width:none}.presentation header .lead,.presentation header .eyebrow{display:none}
+.presentation .layout{grid-template-columns:1fr}.presentation #chain{display:none}
+.presentation .detail{padding:0;border:0}.presentation h2{font-size:38px;max-width:30em}
+.presentation #explanation{font-size:21px;max-width:75ch}
+.presentation .scene-question{font-size:28px}.presentation .condition{padding:28px;background:var(--bg)}.presentation .condition.after{background:var(--pale)}
+.presentation .condition p{font-size:clamp(20px,2.4vw,28px)}.presentation .claim{font-size:15px;max-width:85ch}
+@media(max-width:760px){
+ main{padding:28px 20px}.layout{grid-template-columns:1fr;gap:28px}.detail{grid-row:1;border:0;padding:0}
+ h2{font-size:25px}#chain{border-top:1px solid var(--line)}.toolbar{gap:8px}.toolbar button{padding:8px 12px}
+ .presentation main{padding:24px 20px}.presentation h2{font-size:30px}.presentation #explanation{font-size:18px}
+}
+@media(max-width:520px){
+ .comparison{grid-template-columns:1fr;gap:16px}.condition,.presentation .condition{padding:20px}
+ .scene-question,.presentation .scene-question{font-size:22px}#position{margin-left:0;width:100%}
+ .presentation .condition p{font-size:20px}
+}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.node[aria-current=true] button{transform:none}}
-body{font-family:"Helvetica Neue",Arial,"PingFang SC","Microsoft YaHei",sans-serif}h1,h2{font-weight:500;letter-spacing:-.02em}button,.detail{border-radius:3px}.node[aria-current=true] button{transform:none}.node:not(:last-child):after{content:"";height:18px;border-left:1px solid var(--line);bottom:-22px}.node button{transition:background .2s}.hidden{display:none!important}.scene{border-top:1px solid var(--line);padding-top:20px;margin-top:24px}.scene-question{font-size:20px;line-height:1.6;font-weight:500;margin:8px 0 20px}.comparison{display:grid;grid-template-columns:1fr 1fr;gap:16px}.condition{padding:20px;background:var(--bg);min-width:0;overflow-wrap:anywhere}.condition small{color:var(--soft);font-size:12px}.condition p{margin:12px 0 0;font-size:17px;line-height:1.75}.condition.after{background:var(--pale);border-top:2px solid var(--accent)}.masked #after{visibility:hidden}.masked .after:after{content:"先形成你的预测，再揭示变化。";font-size:14px;color:var(--soft)}#reveal{margin:20px 0 8px;border-color:var(--accent);color:var(--accent)}#takeaway{font-size:15px;color:var(--accent)}.presentation main{max-width:1440px}.presentation .layout{grid-template-columns:1fr}.presentation #chain,.presentation #claims,.presentation header .lead{display:none}.presentation .detail{padding:40px;min-height:55vh}.presentation .condition p{font-size:clamp(20px,2.5vw,32px)}.presentation .scene-question{font-size:28px}.presentation h2{font-size:32px}.presentation #explanation{max-width:75ch}.keyboard-note{font-size:12px;color:var(--soft)}@media(max-width:680px){.comparison{grid-template-columns:1fr}.presentation .detail{padding:20px}.scene-question{font-size:18px}.condition{padding:16px}main{padding:24px 18px}}
-</style>
-<style>
-/* The explanation is a canvas, not a card inside a card. */
-:root{--bg:#f8f8f5}main{padding:32px 24px}.detail{padding:0 0 0 32px;background:transparent;border:0;border-left:1px solid var(--line);border-radius:0}.node button{border:0;border-radius:0;background:none;padding:14px 0;border-bottom:1px solid var(--line)}.node[aria-current=true] button{background:none;border-bottom-color:var(--accent);color:var(--accent)}.node:not(:last-child):after{display:none}.node{margin-bottom:8px}.number{font-size:16px;color:var(--soft)}.node[aria-current=true] .number{color:var(--accent)}.layout{grid-template-columns:minmax(200px,.7fr) minmax(0,1.3fr);gap:32px}.toolbar button{border-color:transparent;background:#eeefeb;border-radius:7px;font-size:14px}#play{background:var(--accent);color:white}.toolbar{gap:8px}.condition{border-radius:7px;background:#eeefeb;padding:20px}.condition.after{border:0;background:var(--pale)}.scene{padding-top:24px}.claim{margin-top:20px}.presentation .detail{padding:24px 0;border:0;background:none}.presentation .condition{padding:28px}.eyebrow{font-size:11px}h1{font-size:clamp(25px,3.5vw,36px)}.lead{font-size:14px;line-height:1.8}#reveal{border:0;background:var(--accent);color:white;border-radius:7px;font-size:14px}.comparison{gap:12px}.relation{font-size:12px}#position{font-size:12px;color:var(--soft);margin-left:8px}#explanation{font-size:16px;line-height:1.85}.scene-question{font-size:19px}#meter{height:3px}@media(max-width:680px){main{padding:24px 0}.layout{grid-template-columns:1fr;gap:28px}.detail{border:0;padding:0}.detail h2{font-size:24px}.node button{padding:12px 0}.presentation .detail{padding:0}.comparison{grid-template-columns:1fr 1fr}.condition{padding:16px}.condition p{font-size:15px}.scene-question{font-size:18px}.toolbar button{padding:8px 12px}}
+@media print{.toolbar,.keyboard-note,.reduced,#meter,#chain{display:none}.layout{display:block}.detail{border:0;padding:0}.masked #after{display:block}.masked .after:after{display:none}body{background:white}main{padding:0}h1,h2,h3{break-after:avoid}}
 </style>
 </head>
 <body>
 <main>
-<header><div class="eyebrow">RESEARCH / LOGIC WALKTHROUGH</div><h1 id="title"></h1>
+<header><div class="eyebrow">论文开讲 / 逐步讲解</div><h1 id="title"></h1>
 <p class="lead">逐步查看研究如何从问题走向方法、证据与边界。每个节点都可以回到支持它的论断。</p></header>
 <div class="toolbar">
 <button id="prev" type="button">上一步</button><button id="play" type="button">播放</button>

@@ -450,7 +450,20 @@ function initResultTabs() {
     const name = tab.dataset.result;
     $$(".result-tab").forEach((item) => {item.classList.toggle("active", item === tab);item.setAttribute("aria-pressed",String(item === tab));});
     $$(".result-panel").forEach((panel) => panel.classList.toggle("active", panel.dataset.resultPanel === name));
+    // A selected artifact should load even when its lazy iframe starts below the viewport.
+    $$(`.result-panel[data-result-panel=${name}] iframe`).forEach(frame => frame.loading = "eager");
   }));
+}
+
+function initProductionSummary() {
+  const options = $('#production-options');
+  const update = () => {
+    const depth = {deep:'专业精读', standard:'标准分析', brief:'快速简报'}[$('#depth-select').value];
+    const format = $('[name=presentation]').value === 'dialogue' ? '双人对话' : '单人讲述';
+    const duration = $('[name=duration]:checked').value;
+    $('#production-summary').textContent = [depth, format, duration === 'auto' ? '智能时长' : `${duration} 分钟`, $('#audio-toggle').checked ? '生成人声' : '不生成人声'].join(' · ');
+  };
+  options.addEventListener('change', update); update();
 }
 
 function setExecutionMode() {
@@ -501,7 +514,7 @@ function initApiSettings() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  keepServiceWhilePageIsOpen(); checkHealth(); loadRecent(); initInputs(); initResultTabs(); initApiSettings();
+  keepServiceWhilePageIsOpen(); checkHealth(); loadRecent(); initInputs(); initResultTabs(); initApiSettings(); initProductionSummary();
   $("#paper-form").addEventListener("submit", submitPaper);
   $("#demo-btn").addEventListener("click", startDemo);
   $("#copy-prompt").addEventListener("click", copyCodexPrompt);

@@ -22,6 +22,10 @@ async function run(){
  fs.mkdirSync(path.join(root,'tests','screenshots'),{recursive:true});
  await page.screenshot({path:path.join(root,'tests','screenshots','web-desktop.png'),fullPage:true});
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ assert.equal(await page.locator('#production-options').getAttribute('open'),null);
+ assert.ok(await page.locator('.workspace-nav a[href="#recent"]').isVisible());
+ await page.locator('#production-options summary').click();
+ assert.equal(await page.locator('#production-options').getAttribute('open'),'');
  assert.equal(await page.locator('#audience-select option').count(),6);
  await page.locator('#audience-select').selectOption('custom');
  await page.locator('#audience-input').fill('会线性代数，没学过量子力学');
@@ -60,6 +64,9 @@ async function run(){
  await page.locator('#file-list button').first().click();assert.equal(await page.locator('#file-list li').count(),1);
  await page.locator('#question-input').fill('浏览器回归测试，不进行真实分析');
  await page.locator('#audio-toggle').uncheck({force:true});
+ assert.ok((await page.locator('#production-summary').innerText()).includes('不生成人声'));
+ await page.locator('#production-options summary').click();
+ assert.equal(await page.locator('#production-options').getAttribute('open'),null);
  await page.locator('button[type=submit]').click();
  await page.waitForFunction(()=>document.querySelector('#codex-prompt').textContent.includes('网页任务'));
  const jobId=new URL(page.url()).searchParams.get('job');
@@ -72,7 +79,14 @@ async function run(){
  await page.locator('#demo-btn').click();await page.waitForSelector('#results:not(.hidden)');
  const report=page.frameLocator('#report-panel iframe');
  await report.locator('h1').waitFor();assert.ok(await report.locator('aside nav a').count()>3);
+ await report.locator('#reader-focus').click();
+ assert.equal(await report.locator('#reader-focus').getAttribute('aria-pressed'),'true');
+ assert.ok(!await report.locator('aside').isVisible());
+ await report.locator('#reader-focus').click();
+ await page.locator('#report-panel').scrollIntoViewIfNeeded();
+ await page.screenshot({path:path.join(root,'tests','screenshots','web-report.png')});
  await page.locator('[data-result="visual"]').click();
+ assert.equal(await page.locator('#visual-panel iframe').getAttribute('loading'),'eager');
  const visual=page.frameLocator('#visual-panel iframe');
  await visual.locator('#chain li').first().waitFor();
  assert.equal(await visual.locator('#play').innerText(),'播放');

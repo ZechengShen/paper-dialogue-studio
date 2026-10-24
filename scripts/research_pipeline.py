@@ -419,8 +419,11 @@ def md_html(text):
             level = len(match[1])
             anchor = ""
             if level == 2:
+                if section:
+                    result.append("</section>")
                 section += 1
                 anchor = f' id="section-{section}"'
+                result.append(f'<section class="report-section" aria-labelledby="section-{section}">')
             result.append(f"<h{level}{anchor}>{html.escape(match[2])}</h{level}>")
         elif is_list:
             if not in_list:
@@ -428,9 +431,12 @@ def md_html(text):
                 in_list = True
             result.append("<li>" + html.escape(line[2:]) + "</li>")
         elif line:
-            result.append("<p>" + html.escape(line) + "</p>")
+            style = ' class="evidence-line"' if line.startswith(("证据：", "状态：")) else ""
+            result.append("<p" + style + ">" + html.escape(line) + "</p>")
     if in_list:
         result.append("</ul>")
+    if section:
+        result.append("</section>")
     return "\n".join(result)
 
 
@@ -465,14 +471,19 @@ def render(episode, data):
         encoded = json.dumps(payload, ensure_ascii=False).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
         visual_path.parent.mkdir(parents=True, exist_ok=True)
         visual_path.write_text(template.replace("__RESEARCH_DATA__", encoded), encoding="utf-8")
-    links = '<a href="followup-plan.md">研究推进计划</a> · <a href="learning-cards.json">自测卡</a>'
+    links = '<a href="followup-plan.md">研究推进计划</a><a href="learning-cards.json">自测卡</a>'
     if make_visual:
-        links += ' · <a href="visuals/logic-chain.html">播放逻辑链</a>'
+        links += '<a href="visuals/logic-chain.html">播放逻辑链</a>'
     headings = re.findall(r"^## (.+)$", report, re.MULTILINE)
     toc = "".join(f'<a href="#section-{i}">{html.escape(title)}</a>' for i, title in enumerate(headings, 1))
     template = (ROOT / "assets" / "report.html").read_text(encoding="utf-8")
-    page = template.replace("__TITLE__", html.escape(data["project"]["title"]))
-    page = page.replace("__LINKS__", links).replace("__TOC__", toc).replace("__REPORT__", md_html(report))
+    metadata = "".join(f"<div><dt>{label}</dt><dd>{count}</dd></div>" for label, count in (
+        ("论文", len(data["papers"])), ("论断", len(data["claims"])),
+        ("证据记录", len(data["evidence"])), ("章节", len(headings))))
+    tokens = {"TITLE": html.escape(data["project"]["title"]), "LINKS": links,
+              "TOC": toc, "REPORT_META": metadata, "REPORT": md_html(report)}
+    # A single pass prevents research text containing token names from being reinterpreted.
+    page = re.sub(r"__(TITLE|LINKS|TOC|REPORT_META|REPORT)__", lambda match: tokens[match[1]], template)
     (episode / "report.html").write_text(page, encoding="utf-8")
     write(episode / "research-build.json", {
         "built_at": datetime.now(timezone.utc).isoformat(), "schema_version": 3,

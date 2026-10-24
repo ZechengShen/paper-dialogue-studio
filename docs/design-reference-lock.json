@@ -1,0 +1,51 @@
+{
+  "checked_on": "2026-10-24",
+  "source": "GitHub REST repository and commit metadata",
+  "policy": "References only. No third-party code, installers, fonts or runtime dependencies vendored. Stars measure attention, not satisfaction or security.",
+  "projects": [
+    {
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "stars": 139536,
+      "forks": 14780,
+      "pushed": "2026-10-23T10:06:31Z",
+      "license": "MIT",
+      "branch": "main",
+      "commit": "d14efff8ed1faa4187f004f79926f428c8074ec7",
+      "url": "https://github.com/nextlevelbuilder/ui-ux-pro-max-skill",
+      "usage": "design reference"
+    },
+    {
+      "repo": "anthropics/skills",
+      "stars": 183355,
+      "forks": 21714,
+      "pushed": "2026-10-09T18:45:52Z",
+      "license": "per-file",
+      "branch": "main",
+      "commit": "dbd4588f9e1033efb41dad4bef2f7947c8993d44",
+      "url": "https://github.com/anthropics/skills",
+      "usage": "frontend-design only; Apache-2.0; document skills not vendored"
+    },
+    {
+      "repo": "hakimel/reveal.js",
+      "stars": 72465,
+      "forks": 17020,
+      "pushed": "2026-09-30T19:38:13Z",
+      "license": "MIT",
+      "branch": "master",
+      "commit": "e240e175232fa2de660a02bc0d7bf5f655b159bb",
+      "url": "https://github.com/hakimel/reveal.js",
+      "usage": "design reference"
+    },
+    {
+      "repo": "slidevjs/slidev",
+      "stars": 49185,
+      "forks": 2244,
+      "pushed": "2026-10-23T06:54:55Z",
+      "license": "MIT",
+      "branch": "main",
+      "commit": "a42aff28dd75f26eb5abbf3d616ea022c3d08924",
+      "url": "https://github.com/slidevjs/slidev",
+      "usage": "design reference"
+    }
+  ]
+}
