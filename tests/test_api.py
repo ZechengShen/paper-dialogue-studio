@@ -2,6 +2,7 @@
 import copy
 import asyncio
 import json
+import re
 import os
 import socket
 import shutil
@@ -20,6 +21,7 @@ from public_sources import public_address, fetch_document, notion_document
 import package_repo
 import research_pipeline as research
 from web import app as site
+from test_opening import add_opening_fixture
 
 
 class ApiTests(unittest.TestCase):
@@ -176,7 +178,7 @@ class ApiTests(unittest.TestCase):
 
     def test_full_api_pipeline_with_synthetic_provider(self):
         """Validate real generation orchestration and release gates, not model quality."""
-        data=research.read(ROOT/'examples/research-v3/research.json')
+        data=add_opening_fixture(research.read(ROOT/'examples/research-v3/research.json'))
         title=data['sources'][0]['title']
         quote='这是 API 软件集成测试的合成来源原句，不是真实论文结论。'
         data['sources'][0]['identity_quote']=quote
@@ -200,7 +202,10 @@ class ApiTests(unittest.TestCase):
                 if prompt.startswith('生成完整'):
                     return copy.deepcopy(data)
                 if prompt.startswith('只生成本章'):
-                    return {'turns':copy.deepcopy(turns)}
+                    budget=int(re.search(r'正文约 (\d+)',prompt).group(1))
+                    result=copy.deepcopy(turns)
+                    for i,t in enumerate(result): t['text']='测'*(budget//len(result)+(i<budget%len(result)))
+                    return {'turns':result}
                 return {'passed':True,'note':'合成测试夹具的文本复核步骤','limitations':'并非实际科学内容或独立人工审稿',
                         'claims':[{'claim_id':c['id'],'passed':True,'reason':'测试原句锚点'} for c in data['claims']],
                         'script_passed':True,'script_reason':'测试结构而非实际教学质量','blocking_issues':[]}
@@ -214,6 +219,9 @@ class ApiTests(unittest.TestCase):
                 with patch('api_workflow.search_arxiv',return_value={'query':'ti:"'+title+'"','status':'not_found','candidates':[]}):
                     result=production.run()
                 self.assertEqual(result['status'],'complete')
+                script=research.read(production.episode/'script.json')
+                self.assertEqual(script['turns'][1]['orientation_topic'],'identity')
+                self.assertTrue(all(t['speaker']=='host' for t in script['turns'][:script['opening']['end_turn']+1]))
                 release=research.read(production.episode/'release.json')
                 self.assertEqual(release['reviewer'],'api_model')
                 self.assertFalse(release['independent_expert_review'])

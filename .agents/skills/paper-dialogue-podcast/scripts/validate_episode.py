@@ -9,6 +9,8 @@ from pathlib import Path
 
 import yaml
 from synthesize_podcast import speech_units
+sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "scripts"))
+from podcast_opening import validate_script_opening
 
 
 def load_json(path: Path) -> dict:
@@ -74,6 +76,7 @@ def validate_script(script: dict, config: dict, errors: list[str], warnings: lis
     allowed_speakers = {"narrator"} if script_format == "single_narrator" else {"host", "learner"}
     presets = set((config.get("voices", {}).get("delivery_presets") or {}).keys())
     rules = config.get("script", {})
+    errors.extend(validate_script_opening(script, config))
     minimum = int(rules.get("turn_characters_min", 35))
     maximum = int(rules.get("turn_characters_max", 180))
 

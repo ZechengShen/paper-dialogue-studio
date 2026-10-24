@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import yaml
+from podcast_opening import validate_plan, validate_alignment
 
 ROOT = Path(__file__).resolve().parents[1]
 ID = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
@@ -42,13 +43,14 @@ def empty_research(title, question):
     return {
         "schema_version": 3,
         "project": {"title": title, "question": question, "audience": "跨专业研究者",
-                    "depth": "deep", "status": "draft"},
+                    "depth": "deep", "status": "draft", "opening_contract_version": 1},
         "sources": [], "papers": [], "evidence": [], "claims": [],
         "logic": {"nodes": [], "edges": []},
         "synthesis": {"summary": "", "agreements": [], "conflicts": [],
                       "comparability": [], "open_questions": []},
         "followups": [],
         "teaching": {"mode": "auto", "selection_reason": "", "objectives": [], "prerequisites": [], "glossary": [], "cards": [], "beats": [],
+                     "opening": {"version": 1, "assumes_unread_paper": True, "segments": []},
                      "visual": {"mode": "auto", "reason": "", "scene_node_ids": [], "scenes": []}},
         "reading_caveats": [],
     }
@@ -288,9 +290,12 @@ def validate(data, script=None):
         refs(scene.get("claim_ids"), claims, "visual.scenes.claim_ids")
         if not set(scene.get("claim_ids", [])).issubset(nodes.get(node_id, {}).get("claim_ids", [])):
             errors.append("动画场景论断必须属于对应逻辑节点")
+    errors.extend(validate_plan(data, required=bool(project.get("opening_contract_version"))))
     if script is not None:
+        if script.get("opening") or project.get("opening_contract_version"):
+            errors.extend(validate_alignment(data, script))
         for i, turn in enumerate(script.get("turns", [])):
-            if turn.get("kind") not in {"disclosure", "transition"}:
+            if turn.get("kind") not in {"disclosure", "transition", "orientation"}:
                 refs(turn.get("claim_ids"), claims, f"script.turns[{i}].claim_ids")
                 if beats and turn.get("chapter") not in beat_chapters:
                     errors.append(f"script.turns[{i}] 的实质章节没有教学设计")
@@ -310,6 +315,12 @@ def markdown(data):
     out = [f"# {p['title']}", "", f"研究问题：{p['question']}", "",
            f"读者：{p['audience']} · 深度：{p['depth']}", "",
            "## 综合判断", "", data["synthesis"]["summary"], ""]
+    opening = data.get("teaching", {}).get("opening", {})
+    if opening.get("segments"):
+        out += ["## 给未读过原文的听众：工作全景", ""]
+        for segment in opening["segments"]:
+            out += [segment["text"], "",
+                    "证据：" + (" / ".join(segment.get("evidence_ids", [])) or "该项尚未确认/不适用，已明确披露"), ""]
     for paper in data["papers"]:
         source = next(s for s in data["sources"] if s["id"] == paper["source_id"])
         out += [f"## {paper['id']} · {source['title']}", "",

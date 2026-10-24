@@ -44,6 +44,13 @@ script:
   turn_characters_min: 35
   turn_characters_max: 180
   disclosure: 本节目由 AI 生成，仅用于教学，不是真人录音或作者访谈。
+  opening:
+    required: true
+    assumes_unread_paper: true
+    single_paper_minutes_hint: [2, 4]
+    multiple_paper_seconds_each_hint: [30, 60]
+    author_context: verified_relevant_contributions_only
+    question_after_orientation: true
 
 voices:
   provider: edge

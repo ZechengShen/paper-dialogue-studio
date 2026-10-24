@@ -33,7 +33,9 @@ teaching:
     "15-20": intuitive
     "30": progressive
     "45-60": progressive_or_reconstruction
-  clarity_rules: [concrete_question_first, explain_before_naming, example_and_nonexample, analogy_boundary, prediction_check]
+  clarity_rules: [paper_orientation_first, concrete_question_after_context, explain_before_naming, example_and_nonexample, analogy_boundary, prediction_check]
+  assumes_unread_paper: true
+  opening_contract_version: 1
   math_policy: explain_meaning_then_symbols_then_check
   default_visual: optional
   adapt_depth_without_weakening_evidence: true

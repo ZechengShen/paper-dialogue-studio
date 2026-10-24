@@ -15,6 +15,7 @@ from api_client import ApiError, ChatClient
 from public_sources import fetch_document, notion_document, search_arxiv
 from source_intake import extract_file, html_document
 from workflow_contract import validate_requested
+from podcast_opening import build_opening, validate_plan
 
 jobs = workflow.jobs
 ROOT = Path(__file__).resolve().parents[1]
@@ -289,13 +290,18 @@ class ApiProduction:
             '不知道的作者或年份不能补造，无法核验则保持未知并把结论标有边界的推断。'
             '每篇 paper 增加 title 原题名用于关联检索记录；检索 queries 必须复制实际 query，未取得全文只能 not_found/unavailable。'
             'teaching.beats 规划 4–10 个有实质内容的章节，精讲材料足够覆盖用户时长，不重复总结。'
+            'project.opening_contract_version=1；另写 teaching.opening，不把开场塞入 beats。'
+            '默认听众完全没读过原文。按契约先写可直接口播的工作身份、第一/共同第一作者、通讯作者、论文当时单位，'
+            '再讲想做什么、具体做什么、做成什么及边界；补必要背景与本期路线。身份来自原文署名/脚注，不按末位作者猜通讯。'
+            '有已核实且与工作相关的代表贡献时再补 author_context，不凭名气论证。未知身份必须在口播中说未确认。'
+            '单篇全景建议2–4分钟；多篇每篇简洁介绍、再做综合，不按字段机械报幕。开场也计入总时长。'
             '逻辑链至少六节点。只有所选节点确实值得解释时才启用动画。单篇评论须有 commentary_crosscheck。'
             '\n用户请求：' + request_text + '\n契约：' + contract + '\n精读规范：' + expert +
             '\n结构示例（仅参考字段，不得复制示例内容或ID引用）：' + json.dumps(sample, ensure_ascii=False) +
             '\n真实检索记录：' + json.dumps(searches, ensure_ascii=False) + '\n实际来源：' + source_text)
         def check_research(value):
             value.setdefault('reading_caveats', []).append('API 仅做文本与定位核验；未完成图表视觉核验、外部实验或独立专家审稿。') if 'API 仅做文本与定位核验；未完成图表视觉核验、外部实验或独立专家审稿。' not in value.get('reading_caveats', []) else None
-            return grounding_errors(value, bundle, searches) + research.validate(value)['errors'] + validate_requested(request, value, None)
+            return grounding_errors(value, bundle, searches) + research.validate(value)['errors'] + validate_plan(value, required=True) + validate_requested(request, value, None)
         data = self.generate('research', prompt, check_research, tokens=32000)
         research.write(self.episode / 'research.json', data)
         self.status('report', 55, '派生精读报告、研究计划、学习卡与解释画面')
@@ -307,12 +313,13 @@ class ApiProduction:
         if not 1 <= len(beats) <= 12:
             raise ApiError('教学章节数量超出范围，请修订底稿。')
         script = {'format': request['presentation'], 'episode_title': data['project']['title'], 'target_minutes': target,
-                  'chapters': [], 'turns': []}
-        role = 'host' if script['format'] == 'dialogue' else 'narrator'
-        script['turns'].append({'speaker': role, 'chapter': beats[0]['chapter'], 'kind': 'disclosure',
-                               'text': config['script']['disclosure'], 'delivery': 'calm', 'pause_ms': 600})
+                  **build_opening(data, config, request['presentation'])}
         from synthesize_podcast import speech_units, build_audio, build_pilot
-        units = round((target * config['script']['characters_per_minute'] - speech_units(config['script']['disclosure'])) / len(beats))
+        opening_units = sum(speech_units(t['text']) for t in script['turns'])
+        remaining_units = target * config['script']['characters_per_minute'] - opening_units
+        if remaining_units < target * config['script']['characters_per_minute'] * .5:
+            raise ApiError('工作介绍占用超过一半目标时长。请压缩作者背景和全景介绍或调整时长，不能挤掉实质分析。')
+        units = round(remaining_units / len(beats))
         script_standard = (REFS / 'script-standard.md').read_text(encoding='utf-8')
         output_contract = (REFS / 'output-contract.md').read_text(encoding='utf-8')
         for index, beat in enumerate(beats):
@@ -320,7 +327,8 @@ class ApiProduction:
             chapter_prompt = ('只生成本章 {"turns":[...]}，不输出完整节目。所有 chapter 必须为 ' + beat['chapter'] +
                 f'。口播正文约 {units} 个汉字等效单位，允许 ±10%；每轮 35–180 字，多轮实质对话展开，不用长段独白。'
                 '每个实质轮次同时带 claim_ids 与 source_refs；只讲底稿支持的事实。以提问、推理、反例、迁移题推进。'
-                '不再添加 AI 披露。不是最后一章则不得作全片最终总结。'+
+                '工作身份和研究全景已在独立开场介绍；从已有背景开始具体追问，不假定听众读过原文。'
+                '不再添加 AI 披露、orientation 或重报作者题名。不是最后一章则不得作全片最终总结。'+
                 '\n章节序号：'+str(index+1)+'/'+str(len(beats))+'\n节目形式：'+script['format']+'\n读者基础：'+request['audience']+
                 '\n全片章计划：'+json.dumps(beats, ensure_ascii=False)+'\n本章：'+json.dumps(beat, ensure_ascii=False)+
                 '\n前章末尾（只用于衔接，不重复）：'+json.dumps(script['turns'][-2:], ensure_ascii=False)+
@@ -334,21 +342,23 @@ class ApiProduction:
                 roles = {t.get('speaker') for t in turns}
                 if (script['format']=='dialogue' and roles != {'host','learner'}) or (script['format']=='single_narrator' and roles != {'narrator'}):
                     errors.append('角色与单人/双人要求不一致。')
-                if any(t.get('kind') == 'disclosure' for t in turns):
-                    errors.append('不要重复披露开场。')
+                if any(t.get('kind') in {'disclosure', 'orientation'} for t in turns):
+                    errors.append('不要重复披露或工作介绍开场。')
                 # Validate all turn fields without applying whole-episode duration to one chapter.
                 for t in turns:
                     if t.get('kind') not in ('transition',) and (not t.get('claim_ids') or not t.get('source_refs')):
                         errors.append('实质轮次缺少证据定位。')
                 return errors
             chapter = self.generate(f'chapter-{index+1:02d}', chapter_prompt, check_chapter, tokens=min(18000, max(6000, units*4)))
-            script['chapters'].append({'title': beat['chapter'], 'start_turn': 0 if index==0 else len(script['turns'])})
+            script['chapters'].append({'title': beat['chapter'], 'start_turn': len(script['turns'])})
             script['turns'].extend(chapter['turns'])
             research.write(self.episode / 'script.json', script)
         workflow.build(self.episode, request)
         self.status('script', 80, '逐项复核论断、脚本与来源是否一致；未通过则停止发布')
         review_prompt = ('独立于写稿步骤做一次实质文本复核，不代表独立专家审稿。逐一检查每个 claim 的事实、边界、证据是否支持，'
-            '脚本是否夸大/捏造、是否有足够推理和迁移练习。返回 {"passed":true/false,"note":"复核范围",'
+            '脚本是否夸大/捏造、是否有足够推理和迁移练习。特别核对开场题名、第一/共同第一作者、通讯作者、单位，'
+            '不能按作者排序猜角色，不能靠名气代替证据；检查目标/方法/结果/边界是否区分，未读原文的人能否跟上。'
+            '返回 {"passed":true/false,"note":"复核范围",'
             '"limitations":"限制","claims":[{"claim_id":"C1","passed":true,"reason":"具体位置及判断"}],'
             '"script_passed":true/false,"script_reason":"说明","blocking_issues":[]}。发现关键图表缺失导致主结论无法核验则 passed=false。'
             '\n来源：'+source_text+'\n底稿：'+json.dumps(data, ensure_ascii=False)+'\n脚本：'+json.dumps(script, ensure_ascii=False))

@@ -22,6 +22,30 @@ V3 网站新增的可执行字段：
 - `teaching.visual.scenes[]` 可选：node_id、question、before、after、takeaway、claim_ids。节点与论断必须对应。用于先预测再揭示的对照，不把两个条件画成已经证明的因果。
 - HTML 精读稿与原文对照保存在顶层 `commentary_crosscheck[]`，字段依 output-contract.md；原文未取得时标 not_verified。`project.analysis_mode` 可明确记录分类，不由文件扩展名推断。
 
+## 新节目的工作全景开场
+
+新任务 `project.opening_contract_version=1`。先在 `teaching.opening` 写面向未读原文听众的口播，再写正文教学 beats：
+
+```json
+{
+  "version": 1,
+  "assumes_unread_paper": true,
+  "segments": [
+    {"paper_id":"P1","topic":"identity","text":"这里是实际可口播的题名、译意、年份与发表状态。","verification":"verified","evidence_ids":["E1"],"claim_ids":[]}
+  ]
+}
+```
+
+上面只演示一项，不是完整模板。每篇必须覆盖 `identity`、`first_authors`（含共同一作）、`corresponding_authors`、`affiliations`、`goal`、`approach`、`findings`、`boundary`，每个主题一段，首次出现该论文时先 identity。整段开场先从第一篇的身份说起。另有 `paper_id=null` 的全片 `prerequisites`（最少背景和术语白话说明）与 `roadmap`（精讲路线）。可选 `author_context` 只讲有来源且相关的代表贡献，不能强行罗列名人。
+
+- `text` 是最终口播，不是写作指令或字段标签；适当短段，不写引用编号或网址。单篇通常合计约 2–4 分钟；多篇紧凑介绍并保留每篇 ID，不占满正文预算。
+- `verification=verified` 表示这段有可定位的已核实证据，`evidence_ids` 必须非空；不表示论文科学结论已经被独立证实。goal/approach/findings/boundary 还须关联该论文 `claim_ids`，明确结论边界。
+- 作者角色、单位、作者背景可用 `unknown` 或 `not_applicable`，允许空 evidence_ids，但口播必须明确“未确认／未标注／不适用”等，而不是凭模型记忆补齐。已确认的一作和无法确认的通讯作者分别记录，不能一概省略。不要依据末位署名猜通讯身份。共同一作需原文注明；单位按原文作者编号映射。
+- 只把实际核查过的作者背景放入 evidence；未核查到可省略 author_context。API 文本模式无法外查时不假装查了机构主页。
+- `scripts/podcast_opening.py --research <目录>/research.json --format dialogue` 输出开场 `opening`、`chapters`、`turns`，不调用模型或语音、不修改文件。把它们作为新脚本前缀，再追加正文并计算 start_turn。API 模式自动执行同一派生逻辑；正文 beats 不重复包含这个开场。
+- `opening.end_turn` 为开场最后一轮的零基索引；开场均由主讲／播报者说明。`orientation` 轮次保留原 text、topic、paper_id、verification、evidence_ids、claim_ids 和派生 source_refs，不能只在字段上打勾却把口播改成其他内容。
+- 历史已完成节目保持原样；新制作／重新构建时遵守新门禁，改稿需另存版本并重新复核和合成。
+
 ## 每篇 papers[].review
 
 对应 expert-reading.md，禁止只放空白提纲：

@@ -18,6 +18,9 @@ import workflow
 from source_intake import html_document, prepare_sources
 from workflow_contract import validate_requested, web_url
 from pypdf import PdfWriter
+from test_opening import add_opening_fixture
+from podcast_opening import build_opening
+import yaml
 
 
 class WebTests(unittest.TestCase):
@@ -110,14 +113,15 @@ class WebTests(unittest.TestCase):
         job_id=self.create()
         result=workflow.prepare(self.root,job_id)
         folder=Path(result["episode"])
-        data=research.read(ROOT/"examples/research-v3/research.json")
+        data=add_opening_fixture(research.read(ROOT/"examples/research-v3/research.json"))
         data["project"]["audience"]=result["request"]["audience"]
         data["project"]["depth"]=result["request"]["depth"]
         data["public_version_search"]=[{"paper_id":"P1","status":"unavailable","queries":["software fixture"],"identity_notes":"本项仅为软件测试夹具，不是一次真实论文检索。"}]
+        config=yaml.safe_load((ROOT/'config/podcast.yaml').read_text(encoding='utf-8'))
         script={"format":"dialogue","episode_title":"软件集成测试，不是真实节目","target_minutes":15,
-                "chapters":[{"title":"研究流程","start_turn":0}],"turns":[
-                {"chapter":"研究流程","speaker":"host","kind":"disclosure","text":"本段为 AI 生成的软件测试，不是真人节目。"},
-                {"chapter":"研究流程","speaker":"learner","kind":"explain","text":"测试"*1700,"claim_ids":["C2","C4"],"source_refs":["WORKFLOW 流程示例"]}]}
+                **build_opening(data,config,'dialogue')}
+        script['chapters'].append({'title':'研究流程','start_turn':len(script['turns'])})
+        script['turns'].append({"chapter":"研究流程","speaker":"learner","kind":"explain","text":"测试"*1700,"claim_ids":["C2","C4"],"source_refs":["WORKFLOW 流程示例"]})
         research.write(folder/"research.json",data);research.write(folder/"script.json",script)
         workflow.build(folder,result["request"])
         with self.assertRaises(OSError): jobs.complete_job(self.root,job_id,None)

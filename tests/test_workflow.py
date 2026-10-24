@@ -18,6 +18,8 @@ import inbox_job as jobs
 import validate_episode as episode
 import audio_preflight
 from workflow_contract import prompt_for
+from test_opening import add_opening_fixture
+from podcast_opening import build_opening
 
 
 class WorkflowTests(unittest.TestCase):
@@ -131,6 +133,7 @@ class WorkflowTests(unittest.TestCase):
             jobs.verify_audio_release(self.path, {"turns":[1]})
 
     def test_v3_completion_and_review_staleness(self):
+        add_opening_fixture(self.data)
         self.data["teaching"]["beats"] = []  # Legacy request fixture; new website tests cover chapter plans.
         jobid = "b" * 32
         result = self.path / "outputs" / "test"
@@ -140,9 +143,9 @@ class WorkflowTests(unittest.TestCase):
         (self.path / "config").mkdir()
         shutil.copyfile(ROOT / "config/podcast.yaml", self.path / "config/podcast.yaml")
         script={"format":"dialogue","episode_title":"门禁测试夹具", "target_minutes":15,
-                "chapters":[{"title":"测试","start_turn":0}], "turns":[
-                {"chapter":"测试","speaker":"host","kind":"disclosure","text":"AI 生成的门禁测试夹具，不是真实节目。"},
-                {"chapter":"测试","speaker":"learner","kind":"question","text":"测试"*1700,"claim_ids":["C1"],"source_refs":["WORKFLOW"]}]}
+                **build_opening(self.data,self.config,"dialogue")}
+        script['chapters'].append({'title':'测试','start_turn':len(script['turns'])})
+        script['turns'].append({"chapter":"测试","speaker":"learner","kind":"question","text":"测试"*1700,"claim_ids":["C1"],"source_refs":["WORKFLOW"]})
         analysis={"metadata":{"title":"测试"},"plain_language_overview":"测试夹具", "logic_chain":[{}, {}, {}, {}], "paragraph_map":[{"location":"test"}]}
         research.write(result / "research.json", self.data)
         research.write(result / "script.json", script)

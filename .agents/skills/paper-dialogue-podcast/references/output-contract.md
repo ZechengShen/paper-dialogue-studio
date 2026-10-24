@@ -92,6 +92,8 @@ V3 新任务还必须遵循 research-v3.md：research.json 为底稿，生成可
 
 ## script.json
 
+新脚本的开场前缀由 research-v3.md 的 `teaching.opening` 派生。顶层新增 `opening: {version: 1, assumes_unread_paper: true, paper_ids: ["P1"], end_turn: <最后开场轮次索引>}`；开场轮次使用 `kind=orientation`，带 `orientation_topic`、`paper_id`、`verification`、`evidence_ids`。元数据或报告里列出题名、作者不等于已向听众介绍，实际口播必须覆盖。下面保留原有正文结构，不能单独作为新节目的完整脚本。
+
 ```json
 {
   "format": "dialogue|single_narrator",
@@ -112,7 +114,7 @@ V3 新任务还必须遵循 research-v3.md：research.json 为底稿，生成可
     {
       "chapter": "开场",
       "speaker": "host|learner|narrator",
-      "kind": "disclosure|explain|question|challenge|recap|transition|brief",
+      "kind": "disclosure|orientation|explain|question|challenge|recap|transition|brief",
       "text": "",
       "delivery": "calm|curious|skeptical|reflective|emphatic|recap|warm",
       "pause_ms": 650,
