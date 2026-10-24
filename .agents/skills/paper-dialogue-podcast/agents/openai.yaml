@@ -1,0 +1,4 @@
+interface:
+  display_name: "专业精读与教学播客"
+  short_description: "用专业追问与技术重建完成单篇或多篇研究、精读报告、双人播客及按需逻辑动画"
+  default_prompt: "使用 $paper-dialogue-podcast 处理最新网页任务，先完成证据驱动的专业精读与技术重建，再生成报告、双人教学播客及按需动画。"

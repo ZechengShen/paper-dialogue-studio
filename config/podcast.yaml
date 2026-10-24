@@ -1,0 +1,113 @@
+version: 3
+
+program:
+  language: zh-CN
+  default_duration_minutes: 45
+  allowed_durations_minutes: [15, 20, 30, 45, 60]
+  host_name: 知原
+  learner_name: 小问
+  narrator_name: 简报
+  title_style: 清晰、克制、准确，不使用夸张标题党
+
+source_routing:
+  content_over_extension: true
+  multi_paper_threshold: 2
+  pdf_single:
+    analysis_mode: single_paper_close_reading
+    presentation: dialogue
+    auto_durations_minutes: [30, 45, 60]
+  html_single:
+    analysis_mode: commentary_plus_original
+    presentation: dialogue
+    auto_durations_minutes: [30, 45, 60]
+  notion_multi:
+    analysis_mode: multi_paper_research
+    presentation: dialogue
+    auto_durations_minutes: [45, 60]
+  explicit_briefing:
+    analysis_mode: multi_paper_briefing
+    presentation: dialogue
+    auto_duration_by_paper_count:
+      "2-3": 15
+      "4-6": 20
+      "7+": 30
+
+analysis:
+  focus: 研究问题、旧认知、缺口、假设、方法取舍、证据、推断边界、替代解释
+  verify_public_versions: true
+  minimum_logic_steps: 6
+  require_source_refs: true
+
+script:
+  characters_per_minute: 230
+  length_tolerance: 0.12
+  turn_characters_min: 35
+  turn_characters_max: 180
+  disclosure: 本节目由 AI 生成，仅用于教学，不是真人录音或作者访谈。
+
+voices:
+  provider: edge
+  host:
+    voice: zh-CN-YunyangNeural
+    rate: -5%
+    pitch: -2Hz
+    volume: +0%
+  learner:
+    voice: zh-CN-XiaoxiaoNeural
+    rate: +2%
+    pitch: +2Hz
+    volume: +0%
+  narrator:
+    voice: zh-CN-YunyangNeural
+    rate: -1%
+    pitch: -1Hz
+    volume: +0%
+  delivery_presets:
+    calm: {rate_delta: -2, pitch_delta_hz: -1, volume_delta: 0, pause_bonus_ms: 40}
+    curious: {rate_delta: 2, pitch_delta_hz: 2, volume_delta: 0, pause_bonus_ms: 20}
+    skeptical: {rate_delta: -3, pitch_delta_hz: 0, volume_delta: 0, pause_bonus_ms: 100}
+    reflective: {rate_delta: -6, pitch_delta_hz: -1, volume_delta: -1, pause_bonus_ms: 150}
+    emphatic: {rate_delta: -1, pitch_delta_hz: 1, volume_delta: 2, pause_bonus_ms: 80}
+    recap: {rate_delta: -4, pitch_delta_hz: -1, volume_delta: 0, pause_bonus_ms: 100}
+    warm: {rate_delta: -2, pitch_delta_hz: 1, volume_delta: 0, pause_bonus_ms: 70}
+
+voice_director:
+  version: 2
+  enabled: true
+  pronunciation_dictionary: pronunciation.yaml
+  min_unit_characters: 10
+  max_unit_characters: 76
+  role_offsets:
+    host: {rate_delta: -1, pitch_delta_hz: -1, volume_delta: 0}
+    learner: {rate_delta: 1, pitch_delta_hz: 1, volume_delta: 0}
+    narrator: {rate_delta: 0, pitch_delta_hz: 0, volume_delta: 0}
+  punctuation_pauses_ms:
+    default: 340
+    comma: 210
+    colon: 330
+    semicolon: 410
+    period: 500
+    question: 580
+    exclamation: 540
+    ellipsis: 680
+  question_rate_delta: 1
+  question_pitch_delta_hz: 1
+  emphasis_keywords: [但是, 不过, 关键, 真正, 注意, 也就是说, 换句话说, 因此, 所以, 证据, 边界, 假设]
+  emphasis_rate_delta: -2
+  emphasis_volume_delta: 1
+  emphasis_pause_bonus_ms: 70
+  quality_control:
+    minimum_segment_ms: 180
+    minimum_characters_per_second: 0.8
+    maximum_characters_per_second: 8.5
+
+audio:
+  format: mp3
+  bitrate: 128k
+  export_wav: false
+  ignore_proxy_env: true
+  target_lufs: -18.0
+  segment_fade_ms: 8
+  speaker_switch_bonus_ms: 80
+  concurrency: 3
+  retries: 3

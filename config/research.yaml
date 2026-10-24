@@ -1,0 +1,69 @@
+# 研究代理执行的项目约定；不是所有条目都是渲染器开关。
+# 代码直接读取论文类型、问题分类、讲解模式及动画节点数量和步进秒数。
+# 实际音频参数与时长容差以 podcast.yaml 为准。
+version: 3
+workflow:
+  stages: [intake, evidence, analysis, report, teaching, media, review]
+  default_depth: deep
+  default_audience: 有兴趣的跨专业研究者
+  audience_presets: [beginner, cross_disciplinary, undergraduate, researcher, expert, custom]
+  audience_policy: adapt_prerequisites_terms_math_not_evidence_standards
+  source_of_truth: research.json
+  publication_requires_review: true
+  followup_execution: requested_only
+  reading_protocol: expert-three-pass-v1
+  method_reference: .agents/skills/paper-dialogue-podcast/references/expert-reading.md
+  question_families: [problem, novelty, method, evidence, alternative, boundary, reproduction, next_step]
+  paper_types: [empirical, theoretical, systems, review, commentary, methodological]
+  expertise_policy: evidence_backed_no_persona_substitution
+routing:
+  single_paper: close_reading
+  multiple_papers: comparative_synthesis
+  briefing_requires: explicit_briefing_request
+  default_presentation: dialogue
+  depth_choices: [brief, standard, deep]
+teaching:
+  default_mode: auto
+  method: explain_predict_check_reteach
+  require_chapter_beats_for_web_v3: true
+  reference_policy: observed_primary_examples_not_persona_imitation
+  modes: [intuitive, progressive, reconstruction, seminar]
+  selection_priority: [explicit_request, audience_and_goal, topic_complexity, duration]
+  duration_hints:
+    "15-20": intuitive
+    "30": progressive
+    "45-60": progressive_or_reconstruction
+  clarity_rules: [concrete_question_first, explain_before_naming, example_and_nonexample, analogy_boundary, prediction_check]
+  math_policy: explain_meaning_then_symbols_then_check
+  default_visual: optional
+  adapt_depth_without_weakening_evidence: true
+reports:
+  formats: [html, markdown]
+  include: [question, paper_dossiers, evidence, logic, synthesis, limitations, followups, learning_cards]
+visuals:
+  policy: auto
+  design_system: swiss-editorial
+  story_order: [question, prediction, reveal, evidence, transfer]
+  semantic_colors: [neutral_context, teal_focus, amber_caution]
+  one_change_per_scene: true
+  default_format: offline_html
+  minimum_logic_nodes: 3
+  maximum_scene_nodes: 8
+  seconds_per_step: 7
+  autoplay: false
+  reduced_motion: true
+  require_evidence_links: true
+  quantitative_simulation_requires_explicit_equations: true
+audio:
+  pilot_units_per_role: 3
+  cache: content_addressed
+  asr_required: false
+  review_samples: [opening, terminology, formulas, role_switch, closing]
+  no_padding_for_duration: true
+quality:
+  require_resolvable_ids: true
+  require_source_locations: true
+  require_followup_acceptance: true
+  require_script_claim_ids: true
+  scientific_review: agent_required
+  audio_review: technical_plus_listening_when_available

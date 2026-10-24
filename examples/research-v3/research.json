@@ -1,0 +1,511 @@
+{
+  "schema_version": 3,
+  "project": {
+    "title": "流程演示｜从文章到可追溯的研究与教学",
+    "question": "怎样先读懂，再清楚地讲出来，并保持报告、播客与动画一致？",
+    "audience": "希望建立固定研究流程的读者",
+    "depth": "standard",
+    "status": "demonstration"
+  },
+  "sources": [
+    {
+      "id": "S1",
+      "title": "研究制作流程 V3（项目设计文档）",
+      "location": "../../../WORKFLOW.md",
+      "kind": "project_design",
+      "access_status": "full_text",
+      "identity_checked": true,
+      "authors": [
+        "本项目工作流设计"
+      ],
+      "year": 2026,
+      "version": "V3 / 2026-10-24",
+      "verified_at": "2026-10-24"
+    }
+  ],
+  "papers": [
+    {
+      "id": "P1",
+      "source_id": "S1",
+      "study_type": "methodological",
+      "question": "如何组织研究与教学制作？",
+      "method": "分阶段建立证据、分析、教学与验收产物。",
+      "limitations": [
+        "流程设计不是教学效果实验；示例不替代实际论文精读。"
+      ],
+      "claim_ids": [
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ],
+      "reading_map": [
+        {
+          "location": "每次固定执行",
+          "role": "流程结构",
+          "summary": "七阶段逐步产生研究和教学材料。",
+          "evidence_ids": [
+            "E1"
+          ]
+        },
+        {
+          "location": "固定交付包",
+          "role": "数据依赖",
+          "summary": "多种材料共享统一底稿。",
+          "evidence_ids": [
+            "E2"
+          ]
+        },
+        {
+          "location": "小动画的决策规则",
+          "role": "教学取舍",
+          "summary": "难以用短文本表达的逻辑才需要动画。",
+          "evidence_ids": [
+            "E3"
+          ]
+        },
+        {
+          "location": "音频生产升级",
+          "role": "质量边界",
+          "summary": "版本一致性与内容、听感判断分开。",
+          "evidence_ids": [
+            "E4"
+          ]
+        }
+      ],
+      "review": {
+        "orientation": {
+          "problem": "怎样让同一份研究可靠地变成报告、对话和动画？",
+          "baseline": "分别写报告、脚本和画图，靠人工保持一致。",
+          "claimed_novelty": "本项目用共享证据底稿和有标签的技术重建组织各类产物，不声称这是新的科学方法。",
+          "relevance": "直接对应用户希望固定研究与教学制作流程的需求。",
+          "reading_decision": "作为流程示例阅读；不是一次科学论文精读验收。"
+        },
+        "passes": [
+          {
+            "pass": 1,
+            "status": "complete",
+            "coverage": "阅读 WORKFLOW.md 的七阶段与范围说明。",
+            "unresolved": []
+          },
+          {
+            "pass": 2,
+            "status": "complete",
+            "coverage": "核对统一底稿、报告、媒体与验收之间的依赖关系。",
+            "unresolved": [
+              "自动化检查不能证明科学内容正确。"
+            ]
+          },
+          {
+            "pass": 3,
+            "status": "complete",
+            "coverage": "重建本地生成链并明确可检验的接口；未运行论文科学实验。",
+            "unresolved": [
+              "线上网页多上传界面尚未实现。"
+            ]
+          }
+        ],
+        "questions": [
+          {
+            "id": "Q1",
+            "family": "problem",
+            "prompt": "最先要解决的不是声音，而是什么？",
+            "answer": "先形成可回到原文的研究判断，媒体制作才有可靠输入。",
+            "status": "answered",
+            "evidence_ids": [
+              "E1"
+            ]
+          },
+          {
+            "id": "Q2",
+            "family": "novelty",
+            "prompt": "相对原有制作方式，这次改变了什么？",
+            "answer": "研究底稿成为多种输出的共同依据，新增专业追问与明确的内容复核。",
+            "status": "answered",
+            "evidence_ids": [
+              "E2"
+            ]
+          },
+          {
+            "id": "Q3",
+            "family": "method",
+            "prompt": "为什么保留论断与证据的独立编号？",
+            "answer": "它们让一句结论能追到原文，也方便脚本和动画共用同一结论。编号不代替内容核查。",
+            "status": "answered",
+            "evidence_ids": [
+              "E2"
+            ]
+          },
+          {
+            "id": "Q4",
+            "family": "evidence",
+            "prompt": "怎样知道一个产物对应当前稿件？",
+            "answer": "本地发布记录绑定稿件与产物的哈希；检查的是版本一致性而非科学真伪。",
+            "status": "answered",
+            "evidence_ids": [
+              "E4"
+            ]
+          },
+          {
+            "id": "Q5",
+            "family": "alternative",
+            "prompt": "不做动画是否也能完成教学？",
+            "answer": "可以。短段文字或表格已说清的问题，不必增加动画。",
+            "status": "answered",
+            "evidence_ids": [
+              "E3"
+            ]
+          },
+          {
+            "id": "Q6",
+            "family": "boundary",
+            "prompt": "自动验证通过是否代表研究正确？",
+            "answer": "不是。还要核对原文、推理、适用条件与未解决问题；技术音频检查也不等于听感。",
+            "status": "answered",
+            "evidence_ids": [
+              "E4"
+            ]
+          },
+          {
+            "id": "Q7",
+            "family": "reproduction",
+            "prompt": "这份示例复现了什么？",
+            "answer": "它只示范本地数据到报告与动画的流程，没有复现实验或模型。",
+            "status": "answered",
+            "evidence_ids": [
+              "E1"
+            ]
+          },
+          {
+            "id": "Q8",
+            "family": "next_step",
+            "prompt": "先做哪项实际验证最有价值？",
+            "answer": "选一篇真实论文完成一轮，再检查听众能否回答机制与边界问题。",
+            "status": "answered",
+            "evidence_ids": [
+              "E3"
+            ]
+          }
+        ],
+        "technical_audit": [
+          {
+            "aspect": "材料性质",
+            "verdict": "supported",
+            "rationale": "这是项目工作流与教学设计说明，不是关于教学效果的实证论文。",
+            "evidence_ids": [
+              "E1"
+            ]
+          },
+          {
+            "aspect": "教学效果",
+            "verdict": "unclear",
+            "rationale": "尚无真实听众测试，不能宣称已经改善学习效果。",
+            "evidence_ids": []
+          }
+        ],
+        "reconstruction": {
+          "inputs": [
+            "结构化研究底稿"
+          ],
+          "steps": [
+            "核对来源与论断编号",
+            "生成报告、推进计划与自测卡",
+            "按需生成逻辑链",
+            "记录版本与复核限制"
+          ],
+          "outputs": [
+            "可追溯的学习材料"
+          ],
+          "assumptions": [
+            "原文核验由任务执行者真实完成"
+          ],
+          "missing_details": [
+            "真实研究任务与学习效果验证"
+          ],
+          "execution_status": "not_run"
+        },
+        "design_reconstruction": {
+          "status": "hypothesis",
+          "target": "降低多种输出之间的版本漂移",
+          "constraints": [
+            "保留历史文件",
+            "不把自动结构检查当科学认证"
+          ],
+          "baseline": "每份产物分别编辑。",
+          "steps": [
+            {
+              "bottleneck": "同一论断在不同文件里容易改变措辞或丢失边界。",
+              "change": "共享证据与论断 ID，衍生产物保留引用。",
+              "prediction": "修改后可以定位需要重审的产物。",
+              "cost": "前期需要维护结构化底稿。",
+              "test": "修改一条证据，检查旧发布记录是否被拒绝。",
+              "epistemic_status": "hypothesis",
+              "evidence_ids": []
+            }
+          ],
+          "competing_routes": [
+            "少量材料可以手动对照，但需额外维护一致性。"
+          ],
+          "unresolved": [
+            "复杂跨论文论证是否需要更细粒度的依赖关系。"
+          ]
+        },
+        "explanation_check": {
+          "plain_language": "先把研究搞清楚并留下证据，再用不同方式把同一个判断讲给人听。",
+          "misconception": "表格填满、动画能播放就算专业精读完成。",
+          "correction": "这些只说明文件结构与表现形式可用；真实理解需要内容核查和可检验的解释。",
+          "transfer_question": "把脚本一句话改了，旧音频还能直接发布吗？",
+          "answer": "不能；应重新核对内容，并生成或复用正确片段，更新与脚本绑定的发布记录。"
+        }
+      }
+    }
+  ],
+  "evidence": [
+    {
+      "id": "E1",
+      "source_id": "S1",
+      "location": "每次固定执行／开头说明",
+      "observation": "流程从立题、证据和分析开始，工具不代替研究判断。",
+      "verification": "verified"
+    },
+    {
+      "id": "E2",
+      "source_id": "S1",
+      "location": "固定交付包",
+      "observation": "research.json 是共同底稿，脚本通过 claim_ids 关联论断。",
+      "verification": "verified"
+    },
+    {
+      "id": "E3",
+      "source_id": "S1",
+      "location": "小动画的决策规则／教学范例",
+      "observation": "动画按解释需要选择，学习卡用于检查理解。",
+      "verification": "verified"
+    },
+    {
+      "id": "E4",
+      "source_id": "S1",
+      "location": "音频生产升级／验收",
+      "observation": "成片保留发布记录，技术检查与科学内容、听感检查分开。",
+      "verification": "verified"
+    }
+  ],
+  "claims": [
+    {
+      "id": "C1",
+      "text": "本流程先完成研究判断，再进行媒体制作。",
+      "type": "author_claim",
+      "boundary": "这是项目制作规范，不是已证明最优的科研方法。",
+      "evidence_ids": [
+        "E1"
+      ]
+    },
+    {
+      "id": "C2",
+      "text": "报告、脚本与动画应共用可追溯的论断和证据。",
+      "type": "author_claim",
+      "boundary": "ID 关联能检查结构，不能自动证明证据支持了论断。",
+      "evidence_ids": [
+        "E2"
+      ]
+    },
+    {
+      "id": "C3",
+      "text": "解释方式需要随目标调整，动画并非每次必需。",
+      "type": "author_claim",
+      "boundary": "教学效果仍需真实使用后验证。",
+      "evidence_ids": [
+        "E3"
+      ]
+    },
+    {
+      "id": "C4",
+      "text": "完成交付需要同时看版本一致性和实际内容检查。",
+      "type": "author_claim",
+      "boundary": "解码和时长合格不等于发音、科学结论或听感已经合格。",
+      "evidence_ids": [
+        "E4"
+      ]
+    }
+  ],
+  "logic": {
+    "nodes": [
+      {
+        "id": "N1",
+        "label": "先问一个具体问题",
+        "explanation": "不是从术语列表开始，而是确定这次到底想理解或判断什么。",
+        "claim_ids": [
+          "C1"
+        ]
+      },
+      {
+        "id": "N2",
+        "label": "回到原文找证据",
+        "explanation": "把作者的主张、实际观察和自己的推断分开放。",
+        "claim_ids": [
+          "C1",
+          "C2"
+        ]
+      },
+      {
+        "id": "N3",
+        "label": "重走解决问题的路径",
+        "explanation": "朴素方案为什么失败？最小改动解决了什么，又付出什么代价？不知道的地方保留为空缺。",
+        "claim_ids": [
+          "C1",
+          "C2"
+        ]
+      },
+      {
+        "id": "N4",
+        "label": "选择合适的讲法",
+        "explanation": "短篇可突出直觉，长篇可展开推导。此图只演示制作流程，并非科学模拟。",
+        "claim_ids": [
+          "C3"
+        ]
+      },
+      {
+        "id": "N5",
+        "label": "检查能否迁移理解",
+        "explanation": "试着改变条件，请读者预测结果。术语记住了，不代表机制理解了。",
+        "claim_ids": [
+          "C3"
+        ]
+      },
+      {
+        "id": "N6",
+        "label": "复核后再交付",
+        "explanation": "底稿、报告、脚本与声音须对应同一版本；内容复核和技术检查各自留下记录。",
+        "claim_ids": [
+          "C2",
+          "C4"
+        ]
+      }
+    ],
+    "edges": [
+      {
+        "from": "N1",
+        "to": "N2",
+        "relation": "motivates",
+        "reason": "先有研究问题，才知道要寻找什么证据。",
+        "evidence_ids": [
+          "E1"
+        ]
+      },
+      {
+        "from": "N2",
+        "to": "N3",
+        "relation": "enables",
+        "reason": "有可核对的材料，才能讨论方法为什么有用。",
+        "evidence_ids": [
+          "E2"
+        ]
+      },
+      {
+        "from": "N3",
+        "to": "N4",
+        "relation": "enables",
+        "reason": "先理解，再选择讲解的细节与顺序。",
+        "evidence_ids": [
+          "E3"
+        ]
+      },
+      {
+        "from": "N4",
+        "to": "N5",
+        "relation": "enables",
+        "reason": "讲解之后用预测题检查理解。",
+        "evidence_ids": [
+          "E3"
+        ]
+      },
+      {
+        "from": "N5",
+        "to": "N6",
+        "relation": "motivates",
+        "reason": "暴露的问题需要回到材料修正。",
+        "evidence_ids": [
+          "E4"
+        ]
+      }
+    ]
+  },
+  "synthesis": {
+    "summary": "这是项目 V3 的可运行流程示例，不是新的论文研究成果。核心是把专业阅读、证据纪律和教学表达连接起来，同时保留不确定性。",
+    "agreements": [
+      "媒体输出共享研究依据。"
+    ],
+    "conflicts": [],
+    "comparability": [],
+    "open_questions": [
+      "真实论文任务中，哪些检查最能提高可理解性？"
+    ]
+  },
+  "followups": [
+    {
+      "id": "F1",
+      "question": "新流程能否帮助读者理解真实论文？",
+      "action": "用一篇用户选择的真实论文试运行，检查一项机制问题和一项边界问题。",
+      "done_when": "完成有来源的报告与脚本，并记录读者回答与需要改进之处。",
+      "expected_artifact": "一次真实任务的试运行评估",
+      "status": "proposed",
+      "priority": "high",
+      "input_ids": [
+        "P1",
+        "C3"
+      ]
+    }
+  ],
+  "teaching": {
+    "mode": "progressive",
+    "selection_reason": "这是流程演示，以六个递进节点展示依赖关系，不展开具体学科推导。",
+    "objectives": [
+      "理解研究与媒体之间的依赖",
+      "区分结构验证、科学复核和听感检查"
+    ],
+    "prerequisites": [
+      "不需要专业背景"
+    ],
+    "glossary": [],
+    "beats": [
+      {
+        "chapter": "研究流程",
+        "question": "怎样知道一个讲解是真的讲清楚，而不只是听起来流畅？",
+        "example": "两个解释都说结构检查通过；一个能给出原文定位，另一个只有顺滑的总结。",
+        "prediction": "如果原文证据缺失，更多动画或更自然的人声能补上这个缺口吗？先给出你的判断。",
+        "check_question": "将一个已经生成的脚本修改后，为什么不能继续发布旧音频？",
+        "check_answer": "旧音频不再对应当前主张和证据；需重新生成受影响片段并核对版本。结构检查和科学复核仍是两种不同工作。",
+        "claim_ids": ["C2", "C4"]
+      }
+    ],
+    "cards": [
+      {
+        "question": "结构验证通过能保证科学结论正确吗？",
+        "answer": "不能；它只检查必要字段、引用关系与版本，内容仍需核验。",
+        "claim_ids": [
+          "C2",
+          "C4"
+        ]
+      }
+    ],
+    "visual": {
+      "mode": "on",
+      "reason": "六阶段存在依赖关系，步进展示有助于看清顺序与边界。",
+      "scenes": [
+        {"node_id": "N1", "question": "直接从一份 PDF 开始写播客，最先会缺少什么？", "before": "材料已经上传，但还不知道这次要解决哪个问题。", "after": "先确定读者与问题，再决定每篇材料的阅读范围。", "takeaway": "示例讨论的是工作流程，不是某篇论文的科学结果。", "claim_ids": ["C1"]},
+        {"node_id": "N5", "question": "听起来懂了，是否就能迁移到新场景？", "before": "听众能重复术语，但不能说明改变一个条件后的结果。", "after": "给一个新的条件，让听众先预测，再用机制解释。", "takeaway": "自测用于暴露理解缺口；不是学习效果已经得到实验验证。", "claim_ids": ["C3"]}
+      ],
+      "scene_node_ids": [
+        "N1",
+        "N2",
+        "N3",
+        "N4",
+        "N5",
+        "N6"
+      ]
+    }
+  },
+  "reading_caveats": [
+    "这是软件与工作流演示，不是全文论文精读，不包含播客音频或独立专家认证。"
+  ]
+}

@@ -1,0 +1,34 @@
+version: 1
+
+# 只改变口播文本，不改 analysis.json、script.json 或屏幕上的原稿。
+literal:
+  arXiv: 阿凯夫
+  et al.: 等人
+  vs.: 对比
+  R²: R 方
+  p-value: P 值
+
+# 英文缩写按独立词匹配，避免误伤英文单词内部的相同字母。
+tokens:
+  AI: A I
+  AGI: A G I
+  LLM: L L M
+  LLMs: L L M
+  GPT: G P T
+  PDF: P D F
+  HTML: H T M L
+  API: A P I
+  GPU: G P U
+  CPU: C P U
+  DNA: D N A
+  RNA: R N A
+
+regex:
+  - pattern: '(\d+(?:\.\d+)?)\s*%'
+    replacement: '百分之\1'
+  - pattern: '(\d+(?:\.\d+)?)\s*[–—-]\s*(\d+(?:\.\d+)?)'
+    replacement: '\1到\2'
+  - pattern: '\bFig\.?\s*(\d+)\b'
+    replacement: '图\1'
+  - pattern: '\bTable\s*(\d+)\b'
+    replacement: '表\1'

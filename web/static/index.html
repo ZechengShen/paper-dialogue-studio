@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="把 HTML 或 PDF 变成逻辑导向的双人教学播客" />
+    <title>论文开讲 V3 · 研究与教学工作台</title>
+    <link rel="stylesheet" href="/static/swiss.css" />
+    <link rel="stylesheet" href="/static/editorial.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#paper-form">跳转到材料输入</a>
+    <header class="topbar shell">
+      <a class="brand" href="/" aria-label="论文开讲首页">
+        <span class="brand-mark" aria-hidden="true">P/</span>
+        <span><strong>论文开讲 · V3</strong><small>Research → Understanding → Teaching</small></span>
+      </a>
+      <div class="api-pill" id="api-pill" role="status"><span></span><b>正在检查项目</b><i id="pending-count">0 个任务</i></div>
+    </header>
+
+    <main>
+      <section class="hero shell">
+        <p class="eyebrow">READ · REASON · TEACH</p>
+        <h1>读懂论文，<br /><em>也读懂背后的推理。</em></h1>
+        <p class="hero-copy">
+          从一篇或多篇材料出发，先建立可靠的研究底稿，再生成精读报告、后续研究计划、教学播客与按需小动画。
+        </p>
+      </section>
+
+      <section class="workspace shell" id="workspace">
+        <form class="input-card" id="paper-form">
+          <div class="card-heading">
+            <span class="step-no">01</span>
+            <div><h2>开始一次精读</h2><p>上传材料，设定问题，选择 Codex 或 API 研究</p></div>
+          </div>
+
+          <div class="source-tabs" role="tablist" aria-label="输入方式">
+            <button type="button" class="source-tab active" data-source="file">上传文件</button>
+            <button type="button" class="source-tab" data-source="url">文章网址</button>
+            <button type="button" class="source-tab" data-source="notion">Notion 链接</button>
+            <button type="button" class="source-tab" data-source="html">粘贴 HTML</button>
+          </div>
+
+          <input type="hidden" name="source_type" id="source-type" value="file" />
+          <div class="source-panel active" data-panel="file">
+            <label class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="选择 PDF 或 HTML 文件">
+              <input id="file-input" name="files" type="file" multiple accept=".pdf,.html,.htm,application/pdf,text/html" />
+              <span class="drop-icon" aria-hidden="true"><svg width="30" height="34" viewBox="0 0 30 34" fill="none"><path d="M7 1.5h10l7 7v23H2v-30h5Z" stroke="currentColor" stroke-width="1.4"/><path d="M17 2v7h7M8 17h10M8 22h10" stroke="currentColor" stroke-width="1.4"/></svg></span>
+              <strong id="file-label">拖入一篇或多篇 PDF / HTML</strong>
+              <small>可分次添加 · 最多 12 个文件 · 单个 36 MB，总计 100 MB</small>
+            </label>
+            <ul id="file-list" class="file-list" aria-label="待导入材料"></ul>
+          </div>
+          <div class="source-panel" data-panel="url">
+            <label class="field-label" for="url-input">公开文章或 PDF 网址</label>
+            <input id="url-input" name="url" class="text-input" type="url" placeholder="https://arxiv.org/pdf/…" />
+            <p class="field-help">只读取公开的 HTTP/HTTPS 地址；本机与内网地址会被拒绝。</p>
+          </div>
+          <div class="source-panel" data-panel="notion">
+            <label class="field-label" for="notion-input">Notion 页面链接</label>
+            <input id="notion-input" name="notion_url" class="text-input" type="url" placeholder="https://workspace.notion.site/Page-…" />
+            <p class="field-help" id="notion-help">私有页面：Codex 模式使用已授权的 Notion 连接；API 模式需填写 Notion Token 并共享页面。多篇默认逐篇精读，再比较综合。</p>
+          </div>
+          <div class="source-panel" data-panel="html">
+            <label class="field-label" for="html-input">HTML 源码</label>
+            <textarea id="html-input" name="html" class="html-input" placeholder="<!doctype html>…"></textarea>
+          </div>
+
+          <details class="extra-sources">
+            <summary>补充文章 / Notion 链接</summary>
+            <label class="field-label" for="additional-urls">每行一个链接，可与文件一起提交</label>
+            <textarea id="additional-urls" name="additional_urls" class="text-input" rows="3" placeholder="https://…"></textarea>
+          </details>
+
+          <div class="research-brief">
+            <label class="field-label" for="question-input">这次想弄清什么？</label>
+            <textarea id="question-input" name="question" class="text-input" rows="2" maxlength="2000" placeholder="例如：这些方法分别解决了什么瓶颈，结论在什么条件下成立？留空则由材料确定。"></textarea>
+            <label class="field-label" for="audience-select">读者基础</label>
+            <select id="audience-select" class="text-input" aria-controls="audience-custom" aria-describedby="audience-help">
+              <option value="零基础入门：从直觉和生活例子开始，补齐必要概念，不假定专业知识">零基础入门</option>
+              <option value="有兴趣的跨专业研究者" selected>跨专业读者</option>
+              <option value="本专业本科生：具备基础课程知识，解释核心公式、方法与实验逻辑">本专业本科生</option>
+              <option value="研究生或研究人员：重视技术细节、证据质量、假设与可复现性">研究生 / 研究人员</option>
+              <option value="领域专家：聚焦新颖性、关键推导、对照设计、争议和研究机会">领域专家</option>
+              <option value="custom">自定义基础与学习目标</option>
+            </select>
+            <div id="audience-custom" class="hidden"><label class="field-label" for="audience-input">具体基础</label><input id="audience-input" class="text-input" maxlength="300" placeholder="例如：会线性代数，但没学过量子力学" /></div>
+            <p class="field-help" id="audience-help">决定先修知识、术语和公式解释的起点；不会降低原文证据的核验要求。</p>
+          </div>
+
+          <div class="options-heading"><h3>制作偏好</h3><span>保留默认即可，也可按需调整</span></div>
+          <div class="options-grid">
+            <label><span class="field-label">研究深度</span><select class="text-input" name="depth" id="depth-select">
+              <option value="deep">专业精读 · 三遍阅读与技术重建</option><option value="standard">标准分析 · 重点论证与证据</option><option value="brief">快速简报 · 明确压缩范围</option>
+            </select></label>
+            <label><span class="field-label">讲解方式</span><select class="text-input" name="teaching_mode">
+              <option value="auto">根据基础、目标与话题选择</option><option value="intuitive">直觉导览</option><option value="progressive">层层深入</option><option value="reconstruction">建构式理解 · 为什么这样设计</option><option value="seminar">研讨审查 · 证据与替代解释</option>
+            </select></label>
+            <label><span class="field-label">节目形式</span><select class="text-input" name="presentation">
+              <option value="dialogue">双人教学对话</option><option value="single_narrator">单人讲述 / 播报</option>
+            </select></label>
+            <label><span class="field-label">逻辑与知识点动画</span><select class="text-input" name="visual_mode">
+              <option value="auto">按解释需要生成</option><option value="on">生成可播放的逻辑链</option><option value="off">不生成动画</option>
+            </select></label>
+            <fieldset>
+              <legend>节目时长</legend>
+              <div class="segmented">
+                <label><input type="radio" name="duration" value="auto" checked /><span>智能*</span></label>
+                <label><input type="radio" name="duration" value="15" /><span>15 分</span></label>
+                <label><input type="radio" name="duration" value="20" /><span>20 分</span></label>
+                <label><input type="radio" name="duration" value="30" /><span>30 分</span></label>
+                <label><input type="radio" name="duration" value="45" /><span>45 分</span></label>
+                <label><input type="radio" name="duration" value="60" /><span>60 分</span></label>
+              </div>
+            </fieldset>
+            <fieldset>
+              <legend>生成内容</legend>
+              <label class="switch-row">
+                <span><b>生成人声 MP3</b><small>神经语音 · 先小样、后全片</small></span>
+                <input type="checkbox" name="synthesize_audio" id="audio-toggle" checked />
+                <i aria-hidden="true"></i>
+              </label>
+            </fieldset>
+          </div>
+
+          <p class="duration-note">* 智能时长：单篇精读 30–60 分钟；多篇深读 45–60 分钟；简报 15–30 分钟。报告、研究计划、学习卡和脚本均会保留。</p>
+
+          <div class="options-heading"><h3>生成方式</h3><span>两种入口，共用 V3 研究规范</span></div>
+          <label class="field-label" for="execution-mode">由谁完成研究与脚本</label>
+          <select id="execution-mode" name="execution_mode" class="text-input">
+            <option value="codex">Codex 接力 · 保存后复制指令</option>
+            <option value="api">API 自动制作 · Kimi / 兼容接口</option>
+          </select>
+          <section id="api-panel" class="api-panel hidden" aria-label="API 设置">
+            <p class="field-help">API 模式读取文本并分章生成；扫描件和关键图表需额外核验。模型负责研究与写稿，Edge 负责语音。密钥不写入任务文件或浏览器存储。</p>
+            <div class="options-grid">
+              <label><span class="field-label">API Base URL</span><input id="api-base" class="text-input" type="url" value="https://api.moonshot.cn/v1" /></label>
+              <label><span class="field-label">模型 ID</span><input id="api-model" class="text-input" value="kimi-k3.1-pro" autocomplete="off" /></label>
+              <label><span class="field-label">API Key</span><input id="api-key" class="text-input" type="password" autocomplete="off" placeholder="粘贴密钥，仅保存到当前服务内存" /></label>
+              <label><span class="field-label">Notion Token（私有页面可选）</span><input id="notion-token" class="text-input" type="password" autocomplete="off" placeholder="页面需共享给 Integration" /></label>
+              <label><span class="field-label">本次运行 API 调用上限</span><input id="api-max-calls" class="text-input" type="number" min="4" max="80" value="32" /></label>
+            </div>
+            <div class="api-actions"><button id="api-save" class="ghost-btn" type="button">保存本次设置</button><button id="api-test" class="ghost-btn" type="button">测试连接</button><button id="api-clear" class="ghost-btn" type="button">清除内存密钥</button></div>
+            <p id="api-settings-status" class="field-help" role="status"></p>
+            <label class="consent-row"><input id="api-consent" type="checkbox" />我同意将材料发送到以上 API 服务，了解模型按量计费。关闭全部网页后，本地 API 任务会停止，可保留缓存继续。</label>
+          </section>
+
+          <div class="form-actions">
+            <button class="primary-btn" type="submit"><span>保存任务并交给 Codex</span><b>→</b></button>
+            <button class="ghost-btn" type="button" id="demo-btn">体验 V3</button>
+          </div>
+          <p class="ai-disclosure" id="execution-help">Codex 模式不需要单独 API Key；保存后把指令发到本项目。所有音频均保留 AI 生成披露。</p>
+        </form>
+
+        <aside class="process-card">
+          <div class="card-heading compact">
+            <span class="step-no">02</span>
+            <div><h2>推理路线</h2><p>每一步都保留可复核依据</p></div>
+          </div>
+          <ol class="route-list">
+            <li><span>1</span><div><b>收件与读取</b><small>保留原文件，提取正文，标出扫描页与待核看图表</small></div></li>
+            <li><span>2</span><div><b>全文与证据</b><small>核验公开版本，逐篇建立可追溯阅读地图</small></div></li>
+            <li><span>3</span><div><b>专业精读与综合</b><small>三遍阅读、八类追问、学科审查与技术重建</small></div></li>
+            <li><span>4</span><div><b>报告与研究推进</b><small>论断绑定证据，下一步有明确问题与完成条件</small></div></li>
+            <li><span>5</span><div><b>教学设计</b><small>由问题引出机制，用例子和迁移题检验理解</small></div></li>
+            <li><span>6</span><div><b>音频与按需动画</b><small>共用研究底稿，先小样、后全片，改稿复用缓存</small></div></li>
+            <li><span>7</span><div><b>验收交付</b><small>内容复核、版本核对与媒体验证后发布</small></div></li>
+          </ol>
+          <div class="logic-note">
+            <span>重点</span>
+            <p>结论会被分成“文章证明了什么”和“文章没有证明什么”。</p>
+          </div>
+        </aside>
+      </section>
+
+      <section class="progress-card shell hidden" id="progress-card" aria-live="polite">
+        <div class="progress-top"><div><span id="progress-phase">准备中</span><strong id="progress-message">正在创建任务</strong></div><b id="progress-value">0%</b></div>
+        <div class="progress-track"><i id="progress-bar"></i></div>
+        <ol id="stage-progress" class="stage-progress"></ol>
+        <div id="intake-summary" class="intake-summary"></div>
+        <button type="button" id="retry-job" class="ghost-btn hidden">保留已有产物，交给 Codex 继续</button>
+        <button type="button" id="stop-api-job" class="ghost-btn hidden">停止 API 制作</button>
+        <div class="handoff-box hidden" id="handoff-box">
+          <div>
+            <span>下一步：复制到 Codex</span>
+            <p id="codex-prompt"></p>
+          </div>
+          <button type="button" id="copy-prompt">复制 Codex 指令</button>
+        </div>
+        <p id="progress-help">Codex 模式需复制指令；API 模式会自动开始。页面自动刷新，任务材料保存在本地。</p>
+      </section>
+
+      <section class="recent shell"><h2>最近的研究任务</h2><div id="recent-jobs" class="recent-jobs"><p class="field-help">正在读取任务记录…</p></div></section>
+
+      <section class="results shell hidden" id="results">
+        <div class="result-hero">
+          <p class="eyebrow">EPISODE READY</p>
+          <h2 id="episode-title">节目标题</h2>
+          <p id="paper-meta"></p>
+          <div class="audio-wrap" id="audio-wrap">
+            <audio id="audio-player" controls preload="metadata"></audio>
+            <div class="audio-empty" id="audio-empty">演示或未勾选人声时不会合成音频；完整生成后，这里会出现 MP3 播放器。</div>
+          </div>
+          <div class="download-row" id="download-row"></div>
+          <p id="review-summary" class="review-summary"></p>
+        </div>
+
+        <nav class="result-tabs" aria-label="结果视图">
+          <button class="result-tab" data-result="report">精读报告</button>
+          <button class="result-tab active" data-result="map">研究地图</button>
+          <button class="result-tab" data-result="logic">逻辑链</button>
+          <button class="result-tab" data-result="script">对话脚本</button>
+          <button class="result-tab" data-result="versions">公开版本</button>
+          <button class="result-tab" data-result="followups">研究推进</button>
+          <button class="result-tab" data-result="cards">学习卡</button>
+          <button class="result-tab" data-result="visual">逻辑动画</button>
+        </nav>
+
+        <div class="result-panel" data-result-panel="report" id="report-panel"></div>
+        <div class="result-panel active" data-result-panel="map" id="map-panel"></div>
+        <div class="result-panel" data-result-panel="logic" id="logic-panel"></div>
+        <div class="result-panel" data-result-panel="script" id="script-panel"></div>
+        <div class="result-panel" data-result-panel="versions" id="versions-panel"></div>
+        <div class="result-panel" data-result-panel="followups" id="followups-panel"></div>
+        <div class="result-panel" data-result-panel="cards" id="cards-panel"></div>
+        <div class="result-panel" data-result-panel="visual" id="visual-panel"></div>
+      </section>
+    </main>
+
+    <footer class="shell">
+      <p>论文开讲 V3 · 专业精读 + 教学与媒体工作流</p>
+      <p>Codex / API 双入口 · 公开版本只列合法来源 · AI 分析仍需回到原文核验</p>
+    </footer>
+
+    <div class="toast hidden" id="toast" role="alert"></div>
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
