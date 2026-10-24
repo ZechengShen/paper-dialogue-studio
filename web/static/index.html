@@ -9,28 +9,29 @@
     <link rel="stylesheet" href="/static/editorial.css" />
   </head>
   <body>
-    <a class="skip-link" href="#paper-form">跳转到材料输入</a>
+    <a class="skip-link" href="#main-content">跳转到主要内容</a>
     <header class="topbar shell">
       <a class="brand" href="/" aria-label="论文开讲首页">
         <span class="brand-mark" aria-hidden="true">P/</span>
         <span><strong>论文开讲</strong><small>研究与教学工作台 · V3</small></span>
       </a>
-      <nav class="workspace-nav" aria-label="工作台导航"><a href="#workspace">开始精读</a><a href="#recent">研究记录</a></nav>
+      <nav class="workspace-nav" aria-label="工作台导航"><a href="#workspace" data-view="new" aria-current="page">新建研究</a><a href="#recent" data-view="recent">研究记录</a><a href="#task-view" data-view="task" id="current-task-link" class="hidden">当前任务</a></nav>
       <div class="api-pill" id="api-pill" role="status"><span></span><b>正在检查项目</b><i id="pending-count">0 个任务</i></div>
     </header>
 
-    <main>
+    <main id="main-content" tabindex="-1">
+      <div id="create-view">
       <section class="hero shell">
-        <h1>把论文读透，<br />把研究讲清楚。</h1>
-        <p class="hero-copy">
-          从 PDF、HTML 或 Notion 开始。<br />先认识工作，再理解方法与证据，最后变成可以阅读、收听和演示的讲解。
-        </p>
+        <div><h1>开始一次精读</h1><p class="hero-copy">放入材料，告诉我们你的阅读起点。其余先用默认设置就好。</p></div>
+        <button class="ghost-btn" type="button" id="demo-btn">先看看成品示例 ↗</button>
       </section>
 
       <section class="workspace shell" id="workspace">
         <form class="input-card" id="paper-form">
+          <div class="intake-column">
+          <section class="form-section" aria-labelledby="material-heading">
           <div class="card-heading">
-            <div><h2>导入研究材料</h2><p>可以是一篇论文，也可以是围绕同一问题的一组文章。</p></div>
+            <span class="section-index" aria-hidden="true">01</span><div><h2 id="material-heading">放入研究材料</h2><p>一篇论文，或围绕同一问题的一组文章。</p></div>
           </div>
 
           <div class="source-tabs" role="tablist" aria-label="输入方式">
@@ -70,10 +71,14 @@
             <label class="field-label" for="additional-urls">每行一个链接，可与文件一起提交</label>
             <textarea id="additional-urls" name="additional_urls" class="text-input" rows="3" placeholder="https://…"></textarea>
           </details>
+          </section>
 
+          <section class="form-section goal-section" aria-labelledby="goal-heading">
+          <div class="card-heading"><span class="section-index" aria-hidden="true">02</span><div><h2 id="goal-heading">确定阅读起点</h2><p>默认你没读过原文，先介绍工作、作者与背景。</p></div></div>
           <div class="research-brief">
-            <label class="field-label" for="question-input">这次想弄清什么？</label>
-            <textarea id="question-input" name="question" class="text-input" rows="2" maxlength="2000" placeholder="例如：这些方法分别解决了什么瓶颈，结论在什么条件下成立？留空则由材料确定。"></textarea>
+            <div class="question-field"><label class="field-label" for="question-input">这次想弄清什么？<span class="optional-label">选填</span></label>
+            <textarea id="question-input" name="question" class="text-input" rows="2" maxlength="2000" placeholder="例如：这个方法解决了什么瓶颈？结论在什么条件下成立？"></textarea></div>
+            <div class="audience-field">
             <label class="field-label" for="audience-select">读者基础</label>
             <select id="audience-select" class="text-input" aria-controls="audience-custom" aria-describedby="audience-help">
               <option value="零基础入门：从直觉和生活例子开始，补齐必要概念，不假定专业知识">零基础入门</option>
@@ -84,11 +89,19 @@
               <option value="custom">自定义基础与学习目标</option>
             </select>
             <div id="audience-custom" class="hidden"><label class="field-label" for="audience-input">具体基础</label><input id="audience-input" class="text-input" maxlength="300" placeholder="例如：会线性代数，但没学过量子力学" /></div>
-            <p class="field-help" id="audience-help">决定先修知识、术语和公式解释的起点；不会降低原文证据的核验要求。</p>
+            <p class="field-help" id="audience-help">决定术语与公式从哪里讲起。</p>
+            </div>
+          </div>
+          </section>
           </div>
 
-          <details class="production-options" id="production-options">
-          <summary><span>调整制作偏好</span><small id="production-summary">专业精读 · 双人对话 · 智能时长 · 生成人声</small></summary>
+          <section class="production-column" aria-labelledby="production-heading">
+          <div class="card-heading"><span class="section-index" aria-hidden="true">03</span><div><h2 id="production-heading">准备开始</h2><p>精读报告、讲解脚本与按需媒体。</p></div></div>
+
+          <div class="production-options">
+          <button type="button" class="settings-trigger" data-dialog="production-options" aria-haspopup="dialog"><span>制作偏好 <i>调整 ↗</i></span><small id="production-summary">专业精读 · 双人对话 · 智能时长 · 生成人声</small></button>
+          <dialog id="production-options" class="settings-dialog" aria-labelledby="preferences-title">
+          <div class="dialog-heading"><div><h2 id="preferences-title">制作偏好</h2><p>不确定时保留默认，之后也可以回来调整。</p></div><button type="button" class="ghost-btn" data-close-dialog aria-label="关闭制作偏好">关闭 ×</button></div>
           <div class="options-grid">
             <label><span class="field-label">研究深度</span><select class="text-input" name="depth" id="depth-select">
               <option value="deep">专业精读 · 三遍阅读与技术重建</option><option value="standard">标准分析 · 重点论证与证据</option><option value="brief">快速简报 · 明确压缩范围</option>
@@ -124,15 +137,19 @@
           </div>
 
           <p class="duration-note">* 智能时长：单篇精读 30–60 分钟；多篇深读 45–60 分钟；简报 15–30 分钟。报告、研究计划、学习卡和脚本均会保留。</p>
-          </details>
+          <div class="dialog-actions"><button class="primary-btn" type="button" data-close-dialog>完成设置</button></div>
+          </dialog>
+          </div>
 
-          <div class="options-heading"><h3>生成方式</h3><span>两种入口，共用 V3 研究规范</span></div>
-          <label class="field-label" for="execution-mode">由谁完成研究与脚本</label>
+          <label class="field-label execution-label" for="execution-mode">生成方式</label>
           <select id="execution-mode" name="execution_mode" class="text-input">
             <option value="codex">Codex 接力 · 保存后复制指令</option>
             <option value="api">API 自动制作 · Kimi / 兼容接口</option>
           </select>
           <section id="api-panel" class="api-panel hidden" aria-label="API 设置">
+            <button class="settings-trigger api-settings-trigger" type="button" data-dialog="api-dialog" aria-haspopup="dialog"><span>API 连接设置 <i>配置 ↗</i></span><small id="api-connection-summary">正在读取连接配置…</small></button>
+            <dialog id="api-dialog" class="settings-dialog" aria-labelledby="api-dialog-title">
+            <div class="dialog-heading"><div><h2 id="api-dialog-title">配置 API 连接</h2><p>使用你自己的 Kimi 或兼容接口。</p></div><button type="button" class="ghost-btn" data-close-dialog aria-label="关闭 API 设置">关闭 ×</button></div>
             <p class="field-help">API 模式读取文本并分章生成；扫描件和关键图表需额外核验。模型负责研究与写稿，Edge 负责语音。密钥不写入任务文件或浏览器存储。</p>
             <div class="options-grid">
               <label><span class="field-label">API Base URL</span><input id="api-base" class="text-input" type="url" value="https://api.moonshot.cn/v1" /></label>
@@ -143,21 +160,22 @@
             </div>
             <div class="api-actions"><button id="api-save" class="ghost-btn" type="button">保存本次设置</button><button id="api-test" class="ghost-btn" type="button">测试连接</button><button id="api-clear" class="ghost-btn" type="button">清除内存密钥</button></div>
             <p id="api-settings-status" class="field-help" role="status"></p>
+            <div class="dialog-actions"><button class="primary-btn" type="button" data-close-dialog>完成设置</button></div>
+            </dialog>
             <label class="consent-row"><input id="api-consent" type="checkbox" />我同意将材料发送到以上 API 服务，了解模型按量计费。关闭全部网页后，本地 API 任务会停止，可保留缓存继续。</label>
           </section>
 
           <div class="form-actions">
             <button class="primary-btn" type="submit"><span>保存任务并交给 Codex</span><b>→</b></button>
-            <button class="ghost-btn" type="button" id="demo-btn">体验 V3</button>
           </div>
           <p class="ai-disclosure" id="execution-help">Codex 模式不需要单独 API Key；保存后把指令发到本项目。所有音频均保留 AI 生成披露。</p>
+          <p class="storage-note">材料与产物保存在本机。不会自动上传到 GitHub。</p>
+          </section>
         </form>
 
-        <aside class="process-card">
-          <div class="card-heading compact">
-            <div><h2>从材料到理解</h2><p>一份底稿，串起所有产物</p></div>
-          </div>
-          <p class="orientation-note">默认你还没读过原文。讲解先介绍<strong>工作、作者和背景</strong>，再说明想做什么、做了什么、做成了什么。</p>
+        <details class="process-card">
+          <summary>提交之后会发生什么？<span>查看研究与交付流程</span></summary>
+          <p class="orientation-note">先介绍工作、作者和背景，再说明想做什么、做了什么、做成了什么。结论会区分“文章证明了什么”和“没有证明什么”。</p>
           <ol class="route-list">
             <li><span>1</span><div><b>收件与读取</b><small>保留原文件，提取正文，标出扫描页与待核看图表</small></div></li>
             <li><span>2</span><div><b>全文与证据</b><small>核验公开版本，逐篇建立可追溯阅读地图</small></div></li>
@@ -167,12 +185,12 @@
             <li><span>6</span><div><b>音频与按需动画</b><small>共用研究底稿，先小样、后全片，改稿复用缓存</small></div></li>
             <li><span>7</span><div><b>验收交付</b><small>内容复核、版本核对与媒体验证后发布</small></div></li>
           </ol>
-          <div class="logic-note">
-            <span>重点</span>
-            <p>结论会被分成“文章证明了什么”和“文章没有证明什么”。</p>
-          </div>
-        </aside>
+        </details>
       </section>
+      </div>
+
+      <div id="task-view" class="hidden">
+      <div class="task-heading shell"><div><p class="eyebrow">当前研究</p><h1 id="task-heading" tabindex="-1">任务进度</h1></div><a href="#workspace" data-view="new" class="text-action">＋ 新建另一项研究</a></div>
 
       <section class="progress-card shell hidden" id="progress-card" aria-live="polite">
         <div class="progress-top"><div><span id="progress-phase">准备中</span><strong id="progress-message">正在创建任务</strong></div><b id="progress-value">0%</b></div>
@@ -190,8 +208,6 @@
         </div>
         <p id="progress-help">Codex 模式需复制指令；API 模式会自动开始。页面自动刷新，任务材料保存在本地。</p>
       </section>
-
-      <section class="recent shell" id="recent"><div class="recent-heading"><h2>研究记录</h2><p>材料与产物保存在本地，随时继续。</p></div><div id="recent-jobs" class="recent-jobs"><p class="field-help">正在读取任务记录…</p></div></section>
 
       <section class="results shell hidden" id="results">
         <div class="result-hero">
@@ -226,11 +242,14 @@
         <div class="result-panel" data-result-panel="cards" id="cards-panel"></div>
         <div class="result-panel" data-result-panel="visual" id="visual-panel"></div>
       </section>
+      </div>
+
+      <section class="recent shell hidden" id="recent"><div class="recent-heading"><div><h1 tabindex="-1">研究记录</h1><p>打开任务继续研究，或回看已经完成的报告与音频。</p></div><a href="#workspace" data-view="new" class="text-action">＋ 新建研究</a></div><div id="recent-jobs" class="recent-jobs"><p class="field-help">正在读取任务记录…</p></div></section>
     </main>
 
     <footer class="shell">
-      <p>论文开讲 V3 · 专业精读 + 教学与媒体工作流</p>
-      <p>Codex / API 双入口 · 公开版本只列合法来源 · AI 分析仍需回到原文核验</p>
+      <p>论文开讲 V3 · 从材料到理解</p>
+      <p>AI 生成内容 · 重要结论请回到原文核验</p>
     </footer>
 
     <div class="toast hidden" id="toast" role="alert"></div>

@@ -22,10 +22,18 @@ async function run(){
  fs.mkdirSync(path.join(root,'tests','screenshots'),{recursive:true});
  await page.screenshot({path:path.join(root,'tests','screenshots','web-desktop.png'),fullPage:true});
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
+ assert.ok(await page.locator('#create-view').isVisible());
+ assert.ok(!await page.locator('#recent').isVisible());
+ assert.equal(await page.locator('.process-card').getAttribute('open'),null);
+ assert.ok(await page.locator('button[type=submit]').evaluate(el=>el.getBoundingClientRect().bottom<innerHeight),'Primary action should be visible without scrolling on desktop.');
  assert.equal(await page.locator('#production-options').getAttribute('open'),null);
  assert.ok(await page.locator('.workspace-nav a[href="#recent"]').isVisible());
- await page.locator('#production-options summary').click();
+ await page.locator('[data-dialog="production-options"]').click();
  assert.equal(await page.locator('#production-options').getAttribute('open'),'');
+ await page.screenshot({path:path.join(root,'tests','screenshots','web-preferences.png')});
+ await page.locator('#production-options').press('Escape');
+ assert.equal(await page.locator('#production-options').getAttribute('open'),null);
+ assert.ok(await page.locator('[data-dialog="production-options"]').evaluate(el=>el===document.activeElement));
  assert.equal(await page.locator('#audience-select option').count(),6);
  await page.locator('#audience-select').selectOption('custom');
  await page.locator('#audience-input').fill('会线性代数，没学过量子力学');
@@ -36,9 +44,12 @@ async function run(){
  await page.locator('#execution-mode').selectOption('api');
  assert.ok(await page.locator('#api-panel').isVisible());
  await page.screenshot({path:path.join(root,'tests','screenshots','web-api-desktop.png'),fullPage:true});
+ await page.locator('[data-dialog="api-dialog"]').click();
  await page.setViewportSize({width:390,height:844});
  assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
- await page.screenshot({path:path.join(root,'tests','screenshots','web-api-mobile.png'),fullPage:true});
+ await page.screenshot({path:path.join(root,'tests','screenshots','web-api-mobile.png')});
+ await page.locator('#api-dialog .dialog-actions button').scrollIntoViewIfNeeded();
+ assert.ok(await page.locator('#api-dialog .dialog-actions button').isVisible());
  await page.setViewportSize({width:1440,height:1000});
  await page.locator('#api-key').fill('browser-test-only-key');
  await page.locator('#api-save').click();
@@ -49,8 +60,16 @@ async function run(){
  assert.ok(!JSON.stringify(publicSettings).includes('browser-test-only-key'));
  await page.locator('#api-clear').click();
  await page.waitForFunction(()=>document.querySelector('#api-settings-status').textContent.includes('模型密钥：未配置'));
+ await page.locator('#api-base').fill('not-a-url');
+ await page.locator('#api-dialog [data-close-dialog]').last().click();
+ await page.locator('button[type=submit]').click();
+ assert.equal(await page.locator('#api-dialog').getAttribute('open'),'','Invalid hidden settings must reveal their dialog.');
+ await page.locator('#api-base').fill('https://api.moonshot.cn/v1');
+ await page.locator('#api-dialog').press('Escape');
  await page.locator('#execution-mode').selectOption('codex');
+ await page.locator('[data-dialog="production-options"]').click();
  assert.ok(await page.locator('.segmented span').first().evaluate(el=>el.getBoundingClientRect().height>=44));
+ await page.locator('#production-options [data-close-dialog]').last().click();
  assert.ok(await page.evaluate(()=>{
    const luminance=color=>{const channels=color.match(/[\d.]+/g).slice(0,3).map(Number).map(v=>v/255).map(v=>v<=0.04045?v/12.92:((v+.055)/1.055)**2.4);return channels[0]*.2126+channels[1]*.7152+channels[2]*.0722};
    return ['.route-list small','.drop-zone small'].every(selector=>{
@@ -63,10 +82,17 @@ async function run(){
  assert.equal(await page.locator('#file-list li').count(),2);
  await page.locator('#file-list button').first().click();assert.equal(await page.locator('#file-list li').count(),1);
  await page.locator('#question-input').fill('浏览器回归测试，不进行真实分析');
+ await page.locator('[data-dialog="production-options"]').click();
  await page.locator('#audio-toggle').uncheck({force:true});
- assert.ok((await page.locator('#production-summary').innerText()).includes('不生成人声'));
- await page.locator('#production-options summary').click();
+ assert.ok((await page.locator('#production-summary').textContent()).includes('不生成人声'));
+ await page.locator('#production-options [data-close-dialog]').last().click();
  assert.equal(await page.locator('#production-options').getAttribute('open'),null);
+ await page.locator('.workspace-nav [data-view="recent"]').click();
+ assert.ok(await page.locator('#recent').isVisible());
+ assert.ok(!await page.locator('#create-view').isVisible());
+ await page.locator('.workspace-nav [data-view="new"]').click();
+ assert.equal(await page.locator('#file-list li').count(),1);
+ assert.equal(await page.locator('#question-input').inputValue(),'浏览器回归测试，不进行真实分析');
  await page.locator('button[type=submit]').click();
  await page.waitForFunction(()=>document.querySelector('#codex-prompt').textContent.includes('网页任务'));
  const jobId=new URL(page.url()).searchParams.get('job');
@@ -74,9 +100,35 @@ async function run(){
  assert.equal(job.request.sources.length,1);assert.equal(job.request.synthesize_audio,false);
  assert.equal(job.request.audience,undergraduate);
  assert.equal(await page.locator('#stage-progress li').count(),7);
+ assert.ok(!await page.locator('#create-view').isVisible());
+ assert.ok(!await page.locator('#recent').isVisible());
+ assert.ok(await page.locator('#task-view').isVisible());
+ await page.screenshot({path:path.join(root,'tests','screenshots','web-task.png'),fullPage:true});
+ await page.locator('.workspace-nav [data-view="new"]').click();
+ assert.equal(await page.locator('#file-list li').count(),1);
+ await page.goBack();
+ assert.ok(await page.locator('#task-view').isVisible());
  await page.reload();await page.waitForFunction(()=>document.querySelector('#progress-phase').textContent==='等待 Codex');
  assert.ok((await page.locator('#codex-prompt').innerText()).includes(jobId));
- await page.locator('#demo-btn').click();await page.waitForSelector('#results:not(.hidden)');
+ await page.locator('.workspace-nav [data-view="recent"]').click();
+ await page.locator('#recent-jobs a').first().click();
+ await page.waitForFunction(()=>document.querySelector('#progress-phase').textContent==='等待 Codex');
+ await page.locator('.workspace-nav [data-view="new"]').click();
+ let releaseDemo;
+ const demoGate=new Promise(resolve=>releaseDemo=resolve);
+ await page.route(url=>/\/api\/jobs\/[a-f0-9]{32}$/.test(url.pathname),async route=>{
+   if(!route.request().url().endsWith(jobId))await demoGate;
+   await route.continue();
+ });
+ await page.locator('#demo-btn').click();await page.waitForSelector('#task-view:not(.hidden)');
+ await page.locator('.workspace-nav [data-view="new"]').click();
+ await page.locator('#question-input').fill('任务完成时仍在编辑的草稿');
+ releaseDemo();
+ await page.waitForFunction(()=>document.querySelector('#task-heading').textContent==='研究结果');
+ assert.ok(await page.locator('#create-view').isVisible(),'Background completion must not steal the current view.');
+ assert.equal(await page.locator('#question-input').inputValue(),'任务完成时仍在编辑的草稿');
+ await page.locator('.workspace-nav [data-view="task"]').click();
+ await page.waitForSelector('#results:not(.hidden)');
  const report=page.frameLocator('#report-panel iframe');
  await report.locator('h1').waitFor();assert.ok(await report.locator('aside nav a').count()>3);
  await report.locator('#reader-focus').click();
@@ -102,13 +154,25 @@ async function run(){
  await page.locator('#visual-panel').scrollIntoViewIfNeeded();
  await visual.locator('#scene-question').waitFor({state:'visible'});
  await page.screenshot({path:path.join(root,'tests','screenshots','web-results-mobile.png')});
- await page.goto(base);await page.locator('[data-source="notion"]').click();
+ await page.goto(base);
+ for(const width of [320,768,1024,390]){
+   await page.setViewportSize({width,height:844});
+   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Layout should fit ${width}px.`);
+ }
+ await page.screenshot({path:path.join(root,'tests','screenshots','web-mobile-home.png'),fullPage:true});
+ await page.locator('.workspace-nav [data-view="recent"]').click();
+ await page.screenshot({path:path.join(root,'tests','screenshots','web-history-mobile.png'),fullPage:true});
+ await page.reload();assert.ok(await page.locator('#recent').isVisible());
+ await page.locator('#recent-jobs a').first().click();
+ assert.ok(await page.locator('#task-view').isVisible());
+ await page.locator('.workspace-nav [data-view="new"]').click();
+ await page.locator('[data-source="notion"]').click();
  assert.equal(await page.locator('[data-source="notion"]').getAttribute('aria-selected'),'true');
  await page.locator('[data-source="notion"]').press('ArrowRight');
  assert.equal(await page.locator('[data-source="html"]').getAttribute('aria-selected'),'true');
  await page.screenshot({path:path.join(root,'tests','screenshots','web-mobile.png'),fullPage:true});
  assert.deepEqual(errors,[]);
- console.log('WEB_BROWSER_OK: desktop/mobile, upload/remove, request options, restore, demo, report, interactive scene, sandbox, keyboard, no JS errors');
+ console.log('WEB_BROWSER_OK: desktop/mobile, focused views, draft preservation, history/back, background completion, upload/remove, options, restore, demo, report, interactive scene, sandbox, keyboard, no JS errors');
 }
 run().catch(e=>{console.error(e);process.exitCode=1}).finally(async()=>{
  if(browser)await browser.close();

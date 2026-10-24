@@ -1,7 +1,7 @@
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
-const state = { jobId: null, pollTimer: null, result: null, codexPrompt: "", reconnecting: false, files: [] };
+const state = { jobId: null, pollTimer: null, result: null, codexPrompt: "", reconnecting: false, files: [], view: "new" };
 const phaseNames = {
   waiting_codex: "等待 Codex", claimed: "Codex 已领取", queued: "准备任务",
   extract: "读取原文", research: "公开版本检索",
@@ -15,6 +15,66 @@ function showToast(message) {
   toast.textContent = message;
   toast.classList.remove("hidden");
   window.setTimeout(() => toast.classList.add("hidden"), 6500);
+}
+
+function setView(view, { navigate = false, focus = false } = {}) {
+  if (view === "task" && !state.jobId) view = "new";
+  state.view = view;
+  [["new", "#create-view"], ["recent", "#recent"], ["task", "#task-view"]].forEach(([name, selector]) => {
+    $(selector).classList.toggle("hidden", name !== view);
+  });
+  $("#current-task-link").classList.toggle("hidden", !state.jobId);
+  if (state.jobId) $("#current-task-link").href = `?job=${encodeURIComponent(state.jobId)}`;
+  $$(".workspace-nav [data-view]").forEach(link => {
+    if (link.dataset.view === view) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  });
+  // Navigation preserves the in-memory draft and never cancels an existing job.
+  if (view !== "task") $("#audio-player").pause();
+  if (navigate) {
+    const url = view === "task" ? `?job=${encodeURIComponent(state.jobId)}` : `#${view === "recent" ? "recent" : "workspace"}`;
+    history.pushState(null, "", location.pathname + url);
+  }
+  document.title = `${{new:"新建研究", recent:"研究记录", task:"当前任务"}[view]} · 论文开讲`;
+  if (focus) {
+    const heading = $(view === "new" ? "#create-view h1" : view === "recent" ? "#recent h1" : "#task-heading");
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+}
+
+function openJob(jobId, navigate = true) {
+  window.clearTimeout(state.pollTimer);
+  showProgress(jobId);
+  if (navigate) history.pushState(null, "", `?job=${encodeURIComponent(jobId)}`);
+  pollJob();
+}
+
+function restoreLocation(focus = true) {
+  const jobId = new URLSearchParams(location.search).get("job");
+  if (jobId && jobId !== state.jobId) openJob(jobId, false);
+  else setView(jobId ? "task" : location.hash === "#recent" ? "recent" : "new", { focus });
+}
+
+function initNavigation() {
+  $$('[data-view]').forEach(link => link.addEventListener('click', event => {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+    event.preventDefault();
+    setView(link.dataset.view, { navigate: true, focus: true });
+    if (link.dataset.view === 'recent') loadRecent();
+  }));
+  window.addEventListener('popstate', () => restoreLocation());
+  $$('[data-dialog]').forEach(button => button.addEventListener('click', () => {
+    const dialog = document.getElementById(button.dataset.dialog);
+    dialog.showModal();
+    // Start at the heading/close action, not a field that opens a mobile keyboard.
+    $('[data-close-dialog]', dialog).focus();
+  }));
+  $$('[data-close-dialog]').forEach(button => button.addEventListener('click', () => button.closest('dialog').close()));
+  $$('.settings-dialog').forEach(dialog => dialog.addEventListener('close', () => {
+    $(`[data-dialog="${dialog.id}"]`).focus({ preventScroll: true });
+  }));
 }
 
 function keepServiceWhilePageIsOpen() {
@@ -116,6 +176,11 @@ async function loadRecent() {
     if (!data.jobs.length) root.append(el("p", "field-help", "还没有任务。上传材料后会自动保存在这里。"));
     data.jobs.forEach(job => {
       const item = el("a", "recent-job"); item.href = `?job=${job.id}`;
+      if (job.id === state.jobId) item.setAttribute("aria-current", "page");
+      item.addEventListener("click", event => {
+        if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        event.preventDefault(); openJob(job.id);
+      });
       item.append(el("b", "", job.title), el("small", "", `${phaseNames[job.status] || (job.status === "running" ? "处理中" : job.status)} · ${job.progress}%`));
       root.append(item);
     });
@@ -141,6 +206,11 @@ async function copyCodexPrompt() {
 
 function showProgress(jobId, prompt = "") {
   state.jobId = jobId;
+  state.result = null;
+  state.reconnecting = false;
+  $("#audio-player").pause();
+  $("#task-heading").textContent = "任务进度";
+  setView("task", { focus: true });
   $("#progress-card").classList.remove("hidden");
   $("#results").classList.add("hidden");
   $("#progress-phase").textContent = "准备任务";
@@ -149,12 +219,16 @@ function showProgress(jobId, prompt = "") {
   $("#progress-bar").style.width = "0%";
   showHandoff(prompt);
   $("#retry-job").classList.add("hidden");
-  $("#progress-card").scrollIntoView({ behavior: "smooth", block: "center" });
+  $("#stop-api-job").classList.add("hidden");
+  $("#stage-progress").replaceChildren();
+  $("#intake-summary").textContent = "";
 }
 
 async function submitPaper(event) {
   event.preventDefault();
   const form = event.currentTarget;
+  const openSettings = $('dialog[open]', form);
+  if (openSettings) { openSettings.close(); return; }
   const type = $("#source-type").value;
   if (type === "file" && !state.files.length) return showToast("请选择一个或多个 PDF / HTML 文件。");
   if (state.files.reduce((sum, f) => sum + f.size, 0) > 99 * 1024 * 1024) return showToast("文件总量接近 100 MB 上限，请分成两个任务。");
@@ -176,7 +250,7 @@ async function submitPaper(event) {
   try {
     if (apiMode) await saveApiSettings();
     const data = await requestJson("/api/jobs", { method: "POST", body: formData });
-    history.replaceState(null, "", `?job=${encodeURIComponent(data.job_id)}`);
+    history.pushState(null, "", `?job=${encodeURIComponent(data.job_id)}`);
     showProgress(data.job_id, data.codex_prompt); pollJob(); checkHealth(); loadRecent();
   } catch (error) {
     showToast(error.message);
@@ -186,7 +260,7 @@ async function submitPaper(event) {
 async function startDemo() {
   try {
     const data = await requestJson("/api/jobs/demo", { method: "POST" });
-    history.replaceState(null, "", `?job=${encodeURIComponent(data.job_id)}`);
+    history.pushState(null, "", `?job=${encodeURIComponent(data.job_id)}`);
     showProgress(data.job_id); pollJob();
   } catch (error) { showToast(error.message); }
 }
@@ -442,7 +516,9 @@ function renderResult(result, jobId) {
   $(`.result-tab[data-result=${preferredTab}]`).click();
   $("#progress-card").classList.add("hidden");
   $("#results").classList.remove("hidden");
-  $("#results").scrollIntoView({ behavior: "smooth", block: "start" });
+  $("#task-heading").textContent = "研究结果";
+  // Finishing in the background must not pull the reader out of another view.
+  if (state.view === "task") window.scrollTo({ top: 0, behavior: "instant" });
 }
 
 function initResultTabs() {
@@ -469,6 +545,7 @@ function initProductionSummary() {
 function setExecutionMode() {
   const apiMode = $('#execution-mode').value === 'api';
   $('#api-panel').classList.toggle('hidden', !apiMode);
+  if (!apiMode) $('#api-dialog').close();
   $$('#api-panel input').forEach(input => input.disabled = !apiMode);
   $('#paper-form button[type=submit] span').textContent = apiMode ? '保存任务并通过 API 制作' : '保存任务并交给 Codex';
   $('#execution-help').textContent = apiMode ? '使用你的 API Key 按量计费；每阶段缓存，遇到证据、长度或媒体检查失败会停止，不伪报完成。' : 'Codex 模式不需要单独 API Key；保存后把指令发到本项目。所有音频均保留 AI 生成披露。';
@@ -479,6 +556,7 @@ function showApiSettings(data) {
   $('#api-model').value = data.model;
   $('#api-max-calls').value = data.max_calls;
   $('#api-settings-status').textContent = `模型密钥：${data.key_configured ? '已配置（不回显）' : '未配置'}；Notion：${data.notion_configured ? '已配置' : '未配置'}。网页输入的密钥随服务退出清除。`;
+  $('#api-connection-summary').textContent = `${data.model} · ${data.key_configured ? '密钥已配置' : '待填写 API Key'}`;
 }
 
 async function saveApiSettings(extra = {}) {
@@ -514,11 +592,14 @@ function initApiSettings() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  keepServiceWhilePageIsOpen(); checkHealth(); loadRecent(); initInputs(); initResultTabs(); initApiSettings(); initProductionSummary();
+  keepServiceWhilePageIsOpen(); checkHealth(); loadRecent(); initInputs(); initResultTabs(); initApiSettings(); initProductionSummary(); initNavigation();
   $("#paper-form").addEventListener("submit", submitPaper);
+  $("#paper-form").addEventListener("invalid", event => {
+    const dialog = event.target.closest('dialog');
+    if (dialog && !dialog.open) dialog.showModal();
+  }, true);
   $("#demo-btn").addEventListener("click", startDemo);
   $("#copy-prompt").addEventListener("click", copyCodexPrompt);
   $("#retry-job").addEventListener("click", retryJob);
-  const existingJob = new URLSearchParams(location.search).get("job");
-  if (existingJob) { showProgress(existingJob); pollJob(); }
+  restoreLocation(false);
 });
