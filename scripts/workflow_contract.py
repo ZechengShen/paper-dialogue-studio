@@ -61,7 +61,7 @@ def request_options(form):
 def prompt_for(job_id, options, resume=False):
     action = "继续处理" if resume else "请处理"
     audio = "自然人声音频" if options.get("synthesize_audio", True) else "不合成人声"
-    return (f"{action}“音频生成”项目中的网页任务 {job_id}。使用 $paper-dialogue-podcast，"
+    return (f"{action} paper-dialogue-studio（音频生成）仓库中的网页任务 {job_id}。使用 $paper-dialogue-podcast，"
             f"先读取 request.json 的用户选项，按 V3 完成来源读取、专业精读与证据综合、可阅读报告、"
             f"后续研究计划、学习卡、教学脚本和{audio}，动画按任务选项生成。"
             "持续回写进度；完成科学内容复核与产物验收后再发布。")

@@ -17,6 +17,7 @@ import synthesize_podcast as synth
 import inbox_job as jobs
 import validate_episode as episode
 import audio_preflight
+from workflow_contract import prompt_for
 
 
 class WorkflowTests(unittest.TestCase):
@@ -32,6 +33,15 @@ class WorkflowTests(unittest.TestCase):
 
     def tearDown(self):
         self.scratch.cleanup()
+
+    def test_handoff_names_canonical_repository(self):
+        job_id = "a" * 32
+        prompt = prompt_for(job_id, {"synthesize_audio": False})
+        self.assertIn("paper-dialogue-studio", prompt)
+        self.assertIn(job_id, prompt)
+        self.assertIn("$paper-dialogue-podcast", prompt)
+        self.assertIn("不合成人声", prompt)
+        self.assertTrue(prompt_for(job_id, {}, resume=True).startswith("继续处理"))
 
     def test_sample_and_render(self):
         self.assertTrue(research.validate(self.data)["valid"])
