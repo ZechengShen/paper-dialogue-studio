@@ -17,6 +17,47 @@ function showToast(message) {
   window.setTimeout(() => toast.classList.add("hidden"), 6500);
 }
 
+function fieldError(selector, message) {
+  const input = $(selector);
+  let note = document.getElementById(input.id + '-error');
+  if (!note) {
+    note = el('p', 'inline-error'); note.id = input.id + '-error'; note.setAttribute('role', 'alert');
+    (input.type === 'checkbox' ? input.closest('label') : input).insertAdjacentElement('afterend', note);
+    input.setAttribute('aria-describedby', [input.getAttribute('aria-describedby'), note.id].filter(Boolean).join(' '));
+  }
+  note.textContent = message; note.classList.remove('hidden');
+  input.setAttribute('aria-invalid', 'true'); input.focus();
+  input.scrollIntoView({block:'center',behavior:'instant'});
+}
+
+function updateSelectionSummary() {
+  const type = $('#source-type').value;
+  const count = state.files.length;
+  const links = $('#additional-urls').value.split('\n').filter(line => line.trim()).length;
+  const main = type === 'file' ? (count ? `${count} 个文件 · ${(state.files.reduce((n,f)=>n+f.size,0)/1024/1024).toFixed(1)} MB` : '请先添加文件') :
+    $({url:'#url-input',notion:'#notion-input',html:'#html-input'}[type]).value.trim() ? {url:'文章网址已填写',notion:'Notion 链接已填写',html:'HTML 内容已填写'}[type] : '请先填写材料';
+  const summary = main + (links ? ` · ${links} 个补充链接` : '');
+  if ($('#selection-summary').textContent !== summary) $('#selection-summary').textContent = summary;
+}
+
+function initEfficiency() {
+  $('#paper-form').addEventListener('input', event => {
+    if (event.target.getAttribute('aria-invalid') === 'true') {
+      event.target.removeAttribute('aria-invalid');
+      document.getElementById(event.target.id + '-error')?.classList.add('hidden');
+    }
+    updateSelectionSummary();
+  });
+  $$('[data-jump]').forEach(button => button.addEventListener('click', () => {
+    const heading = $(button.dataset.jump); heading.tabIndex=-1;
+    heading.scrollIntoView({block:'start',behavior:'instant'}); heading.focus({preventScroll:true});
+  }));
+  $('#history-search').addEventListener('input', renderRecent);
+  $('#history-filter').addEventListener('change', renderRecent);
+  $('#history-reset').addEventListener('click', () => {$('#history-search').value='';$('#history-filter').value='all';renderRecent();$('#history-search').focus();});
+  updateSelectionSummary();
+}
+
 function setView(view, { navigate = false, focus = false } = {}) {
   if (view === "task" && !state.jobId) view = "new";
   state.view = view;
@@ -119,6 +160,7 @@ function setSource(source) {
   $("#source-type").value = source;
   $$(".source-tab").forEach((tab) => { const active=tab.dataset.source === source; tab.classList.toggle("active", active); tab.setAttribute("aria-selected", String(active)); tab.tabIndex=active?0:-1; });
   $$(".source-panel").forEach((panel) => { const active=panel.dataset.panel === source;panel.classList.toggle("active", active);$$("input,textarea",panel).forEach(input=>input.disabled=!active); });
+  updateSelectionSummary();
 }
 
 function initInputs() {
@@ -167,14 +209,25 @@ function renderFiles() {
     remove.addEventListener("click", () => { state.files.splice(index, 1); renderFiles(); });
     item.append(el("span", "", `${file.name} · ${(file.size / 1024 / 1024).toFixed(2)} MB`), remove); root.append(item);
   });
-  $("#file-label").textContent = state.files.length ? `已选 ${state.files.length} 个文件，继续添加` : "拖入一篇或多篇 PDF / HTML";
+  $("#file-label").textContent = state.files.length ? `已选 ${state.files.length} 个文件，点击继续添加` : "拖入 PDF / HTML，或点击选择";
+  if (state.files.length) { $('#drop-zone').removeAttribute('aria-invalid'); $('#drop-zone-error')?.classList.add('hidden'); }
+  updateSelectionSummary();
 }
 
 async function loadRecent() {
   try {
-    const data = await requestJson("/api/jobs"), root = $("#recent-jobs"); root.replaceChildren();
-    if (!data.jobs.length) root.append(el("p", "field-help", "还没有任务。上传材料后会自动保存在这里。"));
-    data.jobs.forEach(job => {
+    const data = await requestJson("/api/jobs"); state.jobs = data.jobs; renderRecent();
+  } catch (_) { $("#recent-jobs").textContent = "暂时无法读取任务记录。"; }
+}
+
+function renderRecent() {
+    const root = $('#recent-jobs'); root.replaceChildren();
+    const query = $('#history-search').value.trim().toLocaleLowerCase(), filter = $('#history-filter').value;
+    const all = state.jobs || [];
+    const jobs = all.filter(job => `${job.title} ${job.id}`.toLocaleLowerCase().includes(query) && (filter === 'all' || (filter === 'active' ? !['complete','error'].includes(job.status) : job.status === filter)));
+    $('#history-count').textContent = `${jobs.length} / ${all.length} 项研究`;
+    if (!jobs.length) root.append(el('p','history-empty', all.length ? '没有匹配的研究。换个关键词，或重置筛选。' : '还没有研究。点击“新建研究”，从一份材料开始。'));
+    jobs.forEach(job => {
       const item = el("a", "recent-job"); item.href = `?job=${job.id}`;
       if (job.id === state.jobId) item.setAttribute("aria-current", "page");
       item.addEventListener("click", event => {
@@ -184,7 +237,6 @@ async function loadRecent() {
       item.append(el("b", "", job.title), el("small", "", `${phaseNames[job.status] || (job.status === "running" ? "处理中" : job.status)} · ${job.progress}%`));
       root.append(item);
     });
-  } catch (_) { $("#recent-jobs").textContent = "暂时无法读取任务记录。"; }
 }
 
 function showHandoff(prompt) {
@@ -230,17 +282,17 @@ async function submitPaper(event) {
   const openSettings = $('dialog[open]', form);
   if (openSettings) { openSettings.close(); return; }
   const type = $("#source-type").value;
-  if (type === "file" && !state.files.length) return showToast("请选择一个或多个 PDF / HTML 文件。");
+  if (type === "file" && !state.files.length) return fieldError('#drop-zone', "请选择一个或多个 PDF / HTML 文件。");
   if (state.files.reduce((sum, f) => sum + f.size, 0) > 99 * 1024 * 1024) return showToast("文件总量接近 100 MB 上限，请分成两个任务。");
-  if (type === "url" && !$("#url-input").value.trim()) return showToast("请输入文章网址。");
-  if (type === "notion" && !$("#notion-input").value.trim()) return showToast("请输入 Notion 页面链接。");
-  if (type === "html" && !$("#html-input").value.trim()) return showToast("请粘贴 HTML 内容。");
+  if (type === "url" && !$("#url-input").value.trim()) return fieldError('#url-input', "请输入文章网址。");
+  if (type === "notion" && !$("#notion-input").value.trim()) return fieldError('#notion-input', "请输入 Notion 页面链接。");
+  if (type === "html" && !$("#html-input").value.trim()) return fieldError('#html-input', "请粘贴 HTML 内容。");
   const formData = new FormData(form);
   const audience = $('#audience-select').value;
-  if (audience === 'custom' && !$('#audience-input').value.trim()) return showToast('请填写自定义读者基础。');
+  if (audience === 'custom' && !$('#audience-input').value.trim()) return fieldError('#audience-input','请填写自定义读者基础。');
   formData.set('audience', audience === 'custom' ? $('#audience-input').value.trim() : audience);
   const apiMode = $('#execution-mode').value === 'api';
-  if (apiMode && !$('#api-consent').checked) return showToast('请先确认 API 材料传输和按量计费说明。');
+  if (apiMode && !$('#api-consent').checked) return fieldError('#api-consent','请先确认 API 材料传输和按量计费说明。');
   formData.set('api_consent', String(apiMode && $('#api-consent').checked));
   formData.delete("files");
   if (type === "file") state.files.forEach(file => formData.append("files", file));
@@ -592,7 +644,7 @@ function initApiSettings() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  keepServiceWhilePageIsOpen(); checkHealth(); loadRecent(); initInputs(); initResultTabs(); initApiSettings(); initProductionSummary(); initNavigation();
+  keepServiceWhilePageIsOpen(); checkHealth(); loadRecent(); initInputs(); initResultTabs(); initApiSettings(); initProductionSummary(); initNavigation(); initEfficiency();
   $("#paper-form").addEventListener("submit", submitPaper);
   $("#paper-form").addEventListener("invalid", event => {
     const dialog = event.target.closest('dialog');

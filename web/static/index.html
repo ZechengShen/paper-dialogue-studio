@@ -46,7 +46,7 @@
             <label class="drop-zone" id="drop-zone" tabindex="0" role="button" aria-label="选择 PDF 或 HTML 文件">
               <input id="file-input" name="files" type="file" multiple accept=".pdf,.html,.htm,application/pdf,text/html" />
               <span class="drop-icon" aria-hidden="true"><svg width="30" height="34" viewBox="0 0 30 34" fill="none"><path d="M7 1.5h10l7 7v23H2v-30h5Z" stroke="currentColor" stroke-width="1.4"/><path d="M17 2v7h7M8 17h10M8 22h10" stroke="currentColor" stroke-width="1.4"/></svg></span>
-              <strong id="file-label">拖入一篇或多篇 PDF / HTML</strong>
+              <strong id="file-label">拖入 PDF / HTML，或点击选择</strong>
               <small>可分次添加 · 最多 12 个文件 · 单个 36 MB，总计 100 MB</small>
             </label>
             <ul id="file-list" class="file-list" aria-label="待导入材料"></ul>
@@ -71,6 +71,7 @@
             <label class="field-label" for="additional-urls">每行一个链接，可与文件一起提交</label>
             <textarea id="additional-urls" name="additional_urls" class="text-input" rows="3" placeholder="https://…"></textarea>
           </details>
+          <button id="mobile-next" type="button" class="flow-next" data-jump="#goal-heading">下一步：阅读起点 ↓</button>
           </section>
 
           <section class="form-section goal-section" aria-labelledby="goal-heading">
@@ -92,11 +93,13 @@
             <p class="field-help" id="audience-help">决定术语与公式从哪里讲起。</p>
             </div>
           </div>
+          <button id="mobile-produce" type="button" class="flow-next" data-jump="#production-heading">下一步：核对制作设置 ↓</button>
           </section>
           </div>
 
           <section class="production-column" aria-labelledby="production-heading">
           <div class="card-heading"><span class="section-index" aria-hidden="true">03</span><div><h2 id="production-heading">准备开始</h2><p>精读报告、讲解脚本与按需媒体。</p></div></div>
+          <p class="intake-status" id="selection-summary" role="status">先在左侧放入材料</p>
 
           <div class="production-options">
           <button type="button" class="settings-trigger" data-dialog="production-options" aria-haspopup="dialog"><span>制作偏好 <i>调整 ↗</i></span><small id="production-summary">专业精读 · 双人对话 · 智能时长 · 生成人声</small></button>
@@ -244,7 +247,7 @@
       </section>
       </div>
 
-      <section class="recent shell hidden" id="recent"><div class="recent-heading"><div><h1 tabindex="-1">研究记录</h1><p>打开任务继续研究，或回看已经完成的报告与音频。</p></div><a href="#workspace" data-view="new" class="text-action">＋ 新建研究</a></div><div id="recent-jobs" class="recent-jobs"><p class="field-help">正在读取任务记录…</p></div></section>
+      <section class="recent shell hidden" id="recent"><div class="recent-heading"><div><h1 tabindex="-1">研究记录</h1><p>打开任务继续研究，或回看已经完成的报告与音频。</p></div><a href="#workspace" data-view="new" class="text-action">＋ 新建研究</a></div><div class="history-tools"><label><span class="field-label">查找研究</span><input id="history-search" class="text-input" type="search" placeholder="输入标题或任务 ID" /></label><label><span class="field-label">任务状态</span><select id="history-filter" class="text-input"><option value="all">全部任务</option><option value="active">待继续 / 进行中</option><option value="complete">已完成</option><option value="error">需处理</option></select></label><button type="button" class="ghost-btn" id="history-reset">重置筛选</button></div><p id="history-count" class="field-help" role="status"></p><div id="recent-jobs" class="recent-jobs"><p class="field-help">正在读取任务记录…</p></div></section>
     </main>
 
     <footer class="shell">

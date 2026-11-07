@@ -26,6 +26,9 @@ async function run(){
  assert.ok(!await page.locator('#recent').isVisible());
  assert.equal(await page.locator('.process-card').getAttribute('open'),null);
  assert.ok(await page.locator('button[type=submit]').evaluate(el=>el.getBoundingClientRect().bottom<innerHeight),'Primary action should be visible without scrolling on desktop.');
+ await page.locator('button[type=submit]').click();
+ assert.equal(await page.locator('#drop-zone').getAttribute('aria-invalid'),'true');
+ assert.ok(await page.locator('#drop-zone-error').isVisible());
  assert.equal(await page.locator('#production-options').getAttribute('open'),null);
  assert.ok(await page.locator('.workspace-nav a[href="#recent"]').isVisible());
  await page.locator('[data-dialog="production-options"]').click();
@@ -80,6 +83,8 @@ async function run(){
  }),'Secondary copy should stay readable against its background.');
  await page.locator('#file-input').setInputFiles([{name:'one.html',mimeType:'text/html',buffer:Buffer.from('<article><h1>Browser fixture one</h1><p>Not a paper.</p></article>')},{name:'two.html',mimeType:'text/html',buffer:Buffer.from('<article><h1>Browser fixture two</h1><p>Not a paper.</p></article>')}]);
  assert.equal(await page.locator('#file-list li').count(),2);
+ assert.ok((await page.locator('#selection-summary').innerText()).includes('2 个文件'));
+ assert.equal(await page.locator('#drop-zone').getAttribute('aria-invalid'),null);
  await page.locator('#file-list button').first().click();assert.equal(await page.locator('#file-list li').count(),1);
  await page.locator('#question-input').fill('浏览器回归测试，不进行真实分析');
  await page.locator('[data-dialog="production-options"]').click();
@@ -111,6 +116,13 @@ async function run(){
  await page.reload();await page.waitForFunction(()=>document.querySelector('#progress-phase').textContent==='等待 Codex');
  assert.ok((await page.locator('#codex-prompt').innerText()).includes(jobId));
  await page.locator('.workspace-nav [data-view="recent"]').click();
+ await page.locator('#history-search').fill('no matching synthetic title');
+ assert.equal(await page.locator('#recent-jobs a').count(),0);
+ assert.ok((await page.locator('#recent-jobs').innerText()).includes('没有匹配'));
+ await page.locator('#history-reset').click();
+ await page.locator('#history-filter').selectOption('complete');
+ assert.equal(await page.locator('#recent-jobs a').count(),0);
+ await page.locator('#history-reset').click();
  await page.locator('#recent-jobs a').first().click();
  await page.waitForFunction(()=>document.querySelector('#progress-phase').textContent==='等待 Codex');
  await page.locator('.workspace-nav [data-view="new"]').click();
@@ -160,7 +172,13 @@ async function run(){
    assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),`Layout should fit ${width}px.`);
  }
  await page.screenshot({path:path.join(root,'tests','screenshots','web-mobile-home.png'),fullPage:true});
+ await page.locator('#mobile-next').click();
+ assert.ok(await page.locator('#goal-heading').evaluate(el=>el===document.activeElement));
+ await page.locator('#mobile-produce').click();
+ assert.ok(await page.locator('#production-heading').evaluate(el=>el===document.activeElement));
+ assert.equal(new URL(page.url()).searchParams.get('job'),null,'Mobile shortcut must not submit.');
  await page.locator('.workspace-nav [data-view="recent"]').click();
+ assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  await page.screenshot({path:path.join(root,'tests','screenshots','web-history-mobile.png'),fullPage:true});
  await page.reload();assert.ok(await page.locator('#recent').isVisible());
  await page.locator('#recent-jobs a').first().click();
