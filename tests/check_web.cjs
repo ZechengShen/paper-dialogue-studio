@@ -26,6 +26,12 @@ async function run(){
  assert.ok(!await page.locator('#recent').isVisible());
  assert.equal(await page.locator('.process-card').getAttribute('open'),null);
  assert.ok(await page.locator('button[type=submit]').evaluate(el=>el.getBoundingClientRect().bottom<innerHeight),'Primary action should be visible without scrolling on desktop.');
+ assert.ok(await page.evaluate(()=>{
+   const x=selector=>document.querySelector(selector).getBoundingClientRect().left;
+   return Math.abs(x('#material-heading')-x('.source-tabs'))<1 && Math.abs(x('#production-heading')-x('#execution-mode'))<1;
+ }),'Section titles and their controls should share a left edge.');
+ assert.equal(await page.locator('#audience-select').evaluate(el=>el.getBoundingClientRect().height),48);
+ assert.equal(await page.locator('#execution-mode').evaluate(el=>el.getBoundingClientRect().height),48);
  await page.locator('button[type=submit]').click();
  assert.equal(await page.locator('#drop-zone').getAttribute('aria-invalid'),'true');
  assert.ok(await page.locator('#drop-zone-error').isVisible());

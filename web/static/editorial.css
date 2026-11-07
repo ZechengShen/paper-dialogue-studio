@@ -39,12 +39,19 @@
 .workspace { display:block; padding-top:24px; border-top:1px solid var(--line); }
 .input-card { display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:64px; padding:0; }
 .intake-column,.production-column { min-width:0; }
-.production-column { padding-left:32px; border-left:1px solid var(--line); }
-.card-heading { gap:14px; margin-bottom:20px; }
+.intake-column {padding-left:32px;}
+.production-column { padding-left:48px; border-left:1px solid var(--line); }
+.card-heading { display:grid;grid-template-columns:20px minmax(0,1fr);gap:12px; margin-bottom:20px; }
+.form-section>.card-heading,.production-column>.card-heading {margin-left:-32px;}
 .section-index { color:var(--accent); font-size:12px; line-height:28px; font-variant-numeric:tabular-nums; }
 .card-heading h2 { font-size:20px; line-height:1.4; margin-bottom:5px; }
 .card-heading p { font-size:13px; line-height:1.7; }
 .text-input,.html-input { font-size:15px; }
+input.text-input,select.text-input {height:48px;min-height:48px;padding-block:10px;}
+.primary-btn,.ghost-btn {min-height:48px;line-height:1.5;}
+.source-tab {line-height:1.5;}
+.drop-icon svg {width:26px;height:30px;display:block;}
+.drop-icon {height:30px;}
 .field-label,fieldset legend { font-size:14px; }
 .source-panel { padding-top:16px; }
 .drop-zone { min-height:160px; background:#edf1ec; }
@@ -110,7 +117,7 @@ footer { padding-top:36px; padding-bottom:24px; }
   .topbar { gap:20px; }
   .workspace-nav { gap:20px; }
   .input-card { grid-template-columns:minmax(0,1fr) 300px; gap:32px; }
-  .production-column { padding-left:24px; }
+  .production-column { padding-left:40px; }
   .research-brief { grid-template-columns:1fr; gap:16px; }
   .api-pill i { display:none; }
 }
@@ -131,6 +138,9 @@ footer { padding-top:36px; padding-bottom:24px; }
   .hero-copy { max-width:38em; }
   .workspace { padding-top:24px; }
   .input-card { display:block; }
+  .intake-column {padding-left:0;}
+  .form-section>.card-heading,.production-column>.card-heading {margin-left:0;grid-template-columns:minmax(0,1fr);}
+  .section-index {display:none;}
   .research-brief { grid-template-columns:minmax(0,1.4fr) minmax(180px,1fr); }
   .production-column { border-left:0; border-top:1px solid var(--line); padding:24px 0 0; margin-top:28px; }
   .production-column .options-grid { grid-template-columns:1fr 1fr; }
