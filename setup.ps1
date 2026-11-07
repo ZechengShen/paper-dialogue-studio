@@ -10,10 +10,22 @@ if (-not (Test-Path -LiteralPath $VenvPython)) {
     $Candidates += (Join-Path $env:USERPROFILE 'anaconda3\python.exe')
     $PythonCommand = Get-Command python -ErrorAction SilentlyContinue
     if ($PythonCommand) { $Candidates += $PythonCommand.Source }
-    $PythonPath = $Candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-    if (-not $PythonPath) { throw 'Python 3.9+ was not found. Set PODCAST_PYTHON and retry.' }
-    & $PythonPath -c "import sys; assert sys.version_info >= (3, 9), sys.version"
-    if ($LASTEXITCODE -ne 0) { throw 'Python 3.9 or later is required.' }
+    $Launcher = Get-Command py -ErrorAction SilentlyContinue
+    if ($Launcher) {
+        try {
+            $LauncherPython = & $Launcher.Source -3 -c "import sys; print(sys.executable)" 2>$null
+            if ($LASTEXITCODE -eq 0 -and $LauncherPython) { $Candidates += [string]$LauncherPython }
+        } catch { }
+    }
+    $PythonPath = $null
+    foreach ($Candidate in ($Candidates | Select-Object -Unique)) {
+        if (-not (Test-Path -LiteralPath $Candidate)) { continue }
+        try {
+            & $Candidate -c "import sys; sys.exit(0 if sys.version_info >= (3, 9) else 1)" 2>$null
+            if ($LASTEXITCODE -eq 0) { $PythonPath = $Candidate; break }
+        } catch { }
+    }
+    if (-not $PythonPath) { throw 'Python 3.9+ was not found. Install Python (3.12 recommended), or set PODCAST_PYTHON to its executable and retry.' }
     & $PythonPath -m venv (Join-Path $ProjectRoot '.venv')
     if ($LASTEXITCODE -ne 0) { throw "Failed to create virtual environment (exit $LASTEXITCODE)." }
 }
